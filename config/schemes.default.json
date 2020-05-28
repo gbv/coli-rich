@@ -49,5 +49,13 @@
       "de": "Basisklassifikation"
     },
     "uri": "http://bartoc.org/en/node/18785"
+  },
+  "sdnb": {
+    "prefLabel": {
+      "de": "Sachgruppen der DNB"
+    },
+    "PICAPATH": "045E$a",
+    "namespace": "http://uri.gbv.de/terminology/sdnb/",
+    "uri": "http://uri.gbv.de/terminology/sdnb"
   }
 }
