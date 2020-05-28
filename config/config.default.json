@@ -3,6 +3,9 @@
     "url": "http://unapi.k10plus.de/",
     "dbkey": "k10plus"
   },
+  "mappings": {
+    "api": "https://coli-conc.gbv.de/api/mappings"
+  },
   "mongo": {
     "user": "",
     "pass": "",

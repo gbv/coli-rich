@@ -39,7 +39,7 @@
     "EXAMPLES": [
       "86.78"
     ],
-    "PICAPATH": "045Q[0X]$a",
+    "PICAPATH": "045Q$a",
     "namespace": "http://uri.gbv.de/terminology/bk/",
     "notation": [
       "BK"
