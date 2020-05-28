@@ -1,0 +1,12 @@
+---
+importer:
+  ndjson:
+    package: JSON
+    options:
+      line_delimited: 1
+exporter:
+  pp:
+    package: PICA
+    options:
+      type: plain
+

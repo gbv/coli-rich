@@ -1,0 +1,13 @@
+{
+  "unapi": {
+    "url": "http://unapi.k10plus.de/",
+    "dbkey": "k10plus"
+  },
+  "mongo": {
+    "user": "",
+    "pass": "",
+    "host": "localhost",
+    "port": 27017,
+    "db": "kxp-mapper"
+  }
+}
