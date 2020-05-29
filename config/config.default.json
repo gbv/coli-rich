@@ -1,16 +1,9 @@
 {
   "unapi": {
     "url": "http://unapi.k10plus.de/",
-    "dbkey": "k10plus"
+    "dbkey": "opac-de-627"
   },
   "mappings": {
     "api": "https://coli-conc.gbv.de/api/mappings"
-  },
-  "mongo": {
-    "user": "",
-    "pass": "",
-    "host": "localhost",
-    "port": 27017,
-    "db": "kxp-mapper"
   }
 }
