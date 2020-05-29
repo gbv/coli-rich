@@ -23,11 +23,11 @@ To view the PICA records in human readable format use:
 
     catmandu convert ndjson to pp < data/records.ndjson
 
-### extend
+### extendpica
 
 Reads and writes a list of line-delimited PICA/JSON records. Checks whether the vocabulary specified first is used but not the second. Looks up a matching mapping and adds a PICA field on success:
 
-    ./extend rvk bk < data/records.ndjson
+    ./extendpica rvk bk < data/records.ndjson
 
 Again, use `catmandu` for inspecting PICA records in plain format. To check which records have been modified use `diff`.
 

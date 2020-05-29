@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+use v5.14;
+use Catmandu ':all';
+use PICA::Data ':all';
+use JSON::PP;
+use HTTP::Tiny;
+use Pod::Usage;
+
+my $http = HTTP::Tiny->new;
+
+require './lib/Config.pm'; ## no critic
+
+my $config = Config::load('config/config');
+my $schemes = Config::load('config/schemes');
+
+sub selectScheme {
+    my $id = shift;
+    my $scheme = $schemes->{$id} or die "unknown scheme: $id\n";
+    my $path = $scheme->{PICAPATH} or die "missing PICAPATH in scheme $id\n";
+    $scheme->{notation} = [ $id ];
+    $scheme->{PICAPATH} = pica_path($path);
+    return $scheme;
+}
+
+
+sub findMappings {
+    my $args = shift;
+
+    my $url = $config->{mappings}{api} . '?' . $http->www_form_urlencode($args);
+    my $res = $http->get($url);
+    die "failed request: $url" unless $res->{success};
+ 
+    return decode_json($res->{content});
+
+    # TODO: filter out mappings with unusable type etc.
+}
+
+pod2usage() unless @ARGV == 2;
+
+my $fromScheme = selectScheme(shift @ARGV);
+my $toScheme = selectScheme(shift @ARGV);
+
+# read PICA records line by line
+importer('ndjson')->each(sub {
+    my $pica = bless shift, 'PICA::Data';
+    my $ppn  = $pica->value('003@$0');
+
+    sub skip {        
+        warn "Skipping $_[0]\n";
+        goto RECORD_DONE;
+    }
+
+    my $path = $fromScheme->{PICAPATH};
+    my $notations = $path->match_record($pica, split => 1);
+
+    skip "$ppn: no " . $fromScheme->{notation}[0]
+        unless $notations;
+
+    skip "$ppn: don't know how to deal with multiple notations"
+        if @$notations > 1;
+    
+    skip "$ppn: already has " . $toScheme->{notation}->[0]
+        if $toScheme->{PICAPATH}->match_record($pica);
+    # TODO: check source, maybe this is an automatic mapping
+   
+    my $mappings = findMappings({
+        fromScheme => $fromScheme->{uri},
+        toScheme => $toScheme->{uri},
+        from => $notations->[0]
+    });
+
+    skip "$ppn: no mappings found for " . $fromScheme->{notation}[0] . " " . $notations->[0]
+        unless @$mappings;
+
+    skip "$ppn: don't know how to deal with multiple mappings"
+        if @$mappings > 1;
+
+    skip "$ppn: don't know how to deal with 1-to-n mappings"
+        if @{$mappings->[0]{to}{memberSet}} > 1;
+
+    # just use the first concept's first notation
+    my $notation = $mappings->[0]{to}{memberSet}[0]{notation}[0];
+    my $uri = $mappings->[0]->{uri};
+    
+    # TODO: bk should be put in 045Q/01, not in 045Q!
+    $path = $toScheme->{PICAPATH}->stringify;
+    skip "$ppn: don't know where to put mapping data"
+        unless $path =~ /^(0[0-9][0-9][A-Z@])\$(.)$/;
+
+    push @$pica, [ $1, undef, $2 => $notation, 'A' => $uri ]; 
+
+   # goto considered evil ;-)
+   RECORD_DONE:
+
+   say encode_json([@$pica]);
+}); 
+
+=head1 SYNOPSIS
+
+ extend FROM TO < records.ndjson
+
+=cut
