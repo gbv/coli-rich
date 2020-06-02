@@ -1,6 +1,6 @@
 test: examples
 
-examples: data/records.ndjson
+examples: data/records.reduced.ndjson
 
-data/records.ndjson: examples/ppns
-	./ppn2pica < $< > $@
+data/records.reduced.ndjson: examples/ppns
+	./ppn2pica < $< | ./reducepica > $@

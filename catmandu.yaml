@@ -1,10 +1,27 @@
 ---
 importer:
+
   ndjson:
     package: JSON
     options:
       line_delimited: 1
+      
+  k10plus:
+    package: SRU
+    options:
+      # !rec=1: Suche nur in Titeldatensätzen
+      base: http://sru.k10plus.de/opac-de-627
+      recordSchema: picaxml
+      parser: picaxml
+
 exporter:
+
+  ndjson:
+    package: JSON
+    options:
+      line_delimited: 1
+      array: 0
+ 
   pp:
     package: PICA
     options:

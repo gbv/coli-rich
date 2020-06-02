@@ -2,37 +2,15 @@
 use v5.14;
 use HTTP::Tiny;
 use JSON::PP;
-use PICA::Data ':all';
-use List::Util 'any';
 
-# fetch records via unAPI and reduce to subject indexing fields 
+# fetch records via unAPI and print as newline delimted PICA/JSON
 
 require './lib/Config.pm'; ## no critic
 
 my $config = Config::load('config/config');
-
 my $unapi = $config->{unapi}{url};
 my $dbkey = $config->{unapi}{dbkey};
 my $http = HTTP::Tiny->new;
-
-my @schemes = grep { $_ } values %{ Config::load('config/schemes') };
-
-sub filter_fields {
-    state $fields = [
-        map { pica_path($_) } '003@', map { $_->{PICAPATH} } @schemes
-    ];
-
-    # TODO: this function should become part of PICA::Data
-    my ($record) = shift;
-    [
-        grep {
-           my $cur = $_;
-           any { $_->match_field($cur) } @$fields; 
-        }
-        @$record
-    ]
-}
-
 
 for my $ppn (<>) {
     chomp $ppn;
@@ -40,6 +18,5 @@ for my $ppn (<>) {
     my $url = "$unapi?format=picajson&id=$dbkey:ppn:$ppn";
     my $res = $http->get($url);
     die "failed unAPI request: $url" unless $res->{success};
-    my $pica = filter_fields( decode_json($res->{content}) );
-    say encode_json($pica); 
+    say encode_json(decode_json($res->{content}));
 }

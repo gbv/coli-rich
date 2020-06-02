@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+use v5.14;
+use JSON::PP;
+use PICA::Data ':all';
+use List::Util 'any';
+
+# reduce pica records to subject indexing fields
+
+require './lib/Config.pm'; ## no critic
+
+my @schemes = grep { $_ } values %{ Config::load('config/schemes') };
+
+sub filter_fields {
+    state $fields = [
+        map { pica_path($_) } '003@', map { $_->{PICAPATH} } @schemes
+    ];
+    
+    # TODO: this function should become part of PICA::Data
+    my ($record) = shift;
+    $record = $record->{record} if ref $record eq 'HASH';   
+    [
+        grep {
+           my $cur = $_;
+           any { $_->match_field($cur) } @$fields; 
+        }
+        @$record
+    ]
+}
+
+while (<>) {
+    my $pica = filter_fields( decode_json($_) );
+    say encode_json($pica); 
+}

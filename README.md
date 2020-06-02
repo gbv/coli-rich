@@ -11,23 +11,29 @@ The current prototype is being developed in Perl based on [Catmandu](https://git
 
 ## Overview
 
-This repository contains several helper scripts to build an automatic workflow.
+This repository contains several helper scripts to build an automatic workflow. PICA+ records are read and written in newline-delimited [PICA/JSON](http://format.gbv.de/pica/json).
+
+To view PICA/JSON records in human readable format use `catmandu`:
+
+    catmandu convert ndjson to pp < data/records.full.ndjson
 
 ### ppn2pica
 
-Reads a list of PPN identifiers from STDIN, fetches the corresponding PICA+ records via unAPI from K10plus, reduces the records to fields used for subject indexing (listed in field `PICAPATH` in `config/schemes.ndjson`) and prints the records in line-delimited PICA/JSON format:
+Reads a list of PPN identifiers from STDIN, fetches the corresponding PICA+ records via unAPI from K10plus and prints the records in line-delimited PICA/JSON:
 
-    ./ppn2pica < examples/ppns > data/records.ndjson
+    ./ppn2pica < examples/ppns > data/records.full.ndjson
 
-To view the PICA records in human readable format use:
+### reducepica
 
-    catmandu convert ndjson to pp < data/records.ndjson
+Reads and writes newline-delimited PICA/JSON. Reduces the records to fields used for subject indexing (listed in field `PICAPATH` in `config/schemes.ndjson`):
+
+    ./reducepica < data/record.full.ndjson > data/records.reduced.ndjson
 
 ### extendpica
 
 Reads and writes a list of line-delimited PICA/JSON records. Checks whether the vocabulary specified first is used but not the second. Looks up a matching mapping and adds a PICA field on success:
 
-    ./extendpica rvk bk < data/records.ndjson
+    ./extendpica rvk bk < data/records.reduced.ndjson
 
 Again, use `catmandu` for inspecting PICA records in plain format. To check which records have been modified use `diff`.
 
