@@ -5,6 +5,7 @@ use PICA::Data ':all';
 use JSON::PP;
 use HTTP::Tiny;
 use Pod::Usage;
+use Getopt::Long;
 
 my $http = HTTP::Tiny->new;
 
@@ -12,6 +13,11 @@ require './lib/Config.pm'; ## no critic
 
 my $config = Config::load('config/config');
 my $schemes = Config::load('config/schemes');
+
+my %opt;
+GetOptions(\%opt, 'quiet|q', 'help|h|?', 'modified|m') or pod2usage(2);
+pod2usage(1) if exists $opt{help};
+pod2usage() unless @ARGV == 2;
 
 sub selectScheme {
     my $id = shift;
@@ -21,7 +27,6 @@ sub selectScheme {
     $scheme->{PICAPATH} = pica_path($path);
     return $scheme;
 }
-
 
 sub findMappings {
     my $args = shift;
@@ -35,8 +40,6 @@ sub findMappings {
     # TODO: filter out mappings with unusable type etc.
 }
 
-pod2usage() unless @ARGV == 2;
-
 my $fromScheme = selectScheme(shift @ARGV);
 my $toScheme = selectScheme(shift @ARGV);
 
@@ -46,8 +49,8 @@ importer('ndjson')->each(sub {
     my $ppn  = $pica->value('003@$0');
 
     sub skip {        
-        warn "Skipping $_[0]\n";
-        goto RECORD_DONE;
+        warn "Skipping $_[0]\n" unless $opt{quiet};
+        $opt{modified} ? goto RECORD_END : goto RECORD_DONE;
     }
 
     my $path = $fromScheme->{PICAPATH};
@@ -91,12 +94,22 @@ importer('ndjson')->each(sub {
 
    # goto considered evil ;-)
    RECORD_DONE:
-
    say encode_json([@$pica]);
+   RECORD_END:
 }); 
 
 =head1 SYNOPSIS
 
- extend FROM TO < records.ndjson
+ extendpica [OPTIONS] FROM TO < records.ndjson
+
+=head1 OPTIONS
+
+=head2 --quiet
+
+Omit messages and warnings to STDERR
+
+=head2 --modified
+
+Print modified records only
 
 =cut

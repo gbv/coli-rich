@@ -11,11 +11,13 @@ The current prototype is being developed in Perl based on [Catmandu](https://git
 
 ## Overview
 
-This repository contains several helper scripts to build an automatic workflow. PICA+ records are read and written in newline-delimited [PICA/JSON](http://format.gbv.de/pica/json).
+This repository contains several helper scripts to build an automatic workflow.
 
-To view PICA/JSON records in human readable format use `catmandu`:
+PICA+ records are read and written in newline-delimited [PICA/JSON](http://format.gbv.de/pica/json). To view PICA/JSON records in human readable format use `catmandu`, e.g.:
 
-    catmandu convert ndjson to pp < data/records.full.ndjson
+    catmandu convert ndjson to pp < data/records.reduced.ndjson
+
+Run `make` to execute the scripts with some examples.
 
 ### ppn2pica
 
@@ -31,11 +33,13 @@ Reads and writes newline-delimited PICA/JSON. Reduces the records to fields used
 
 ### extendpica
 
-Reads and writes a list of line-delimited PICA/JSON records. Checks whether the vocabulary specified first is used but not the second. Looks up a matching mapping and adds a PICA field on success:
+Reads and writes a list of line-delimited PICA/JSON records. Records must have a PPN at least. Checks whether the vocabulary specified as first argument is used but not the second. Looks up a matching mappings and adds a PICA field on success:
 
     ./extendpica rvk bk < data/records.reduced.ndjson
 
-Again, use `catmandu` for inspecting PICA records in plain format. To check which records have been modified use `diff`.
+Again, use `catmandu` for inspecting PICA records in plain format. See `extendpica --help` for additional options.
+
+To check which records have been modified use `diff`.
 
 *This is a very early prototype, only simple cases a supported!*
 
