@@ -15,9 +15,11 @@ my $config = Config::load('config/config');
 my $schemes = Config::load('config/schemes');
 
 my %opt;
-GetOptions(\%opt, 'quiet|q', 'help|h|?', 'modified|m') or pod2usage(2);
+GetOptions(\%opt, 'quiet|q', 'help|h|?', 'modified|m', 'plain|p') or pod2usage(2);
 pod2usage(1) if exists $opt{help};
 pod2usage() unless @ARGV == 2;
+
+my $writer = pica_writer( $opt{plain} ? 'plain' : 'json' );
 
 sub selectScheme {
     my $id = shift;
@@ -94,7 +96,7 @@ importer('ndjson')->each(sub {
 
    # goto considered evil ;-)
    RECORD_DONE:
-   say encode_json([@$pica]);
+   $writer->write($pica);
    RECORD_END:
 }); 
 
@@ -104,12 +106,16 @@ importer('ndjson')->each(sub {
 
 =head1 OPTIONS
 
-=head2 --quiet
+=head2 --quiet|q
 
 Omit messages and warnings to STDERR
 
-=head2 --modified
+=head2 --modified|m
 
 Print modified records only
+
+=head2 --plain|p
+
+Print records in plain PICA syntax instead of PICA JSON.
 
 =cut
