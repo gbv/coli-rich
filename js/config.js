@@ -2,6 +2,7 @@ export default
 {
   unapi: "https://unapi.k10plus.de/",
   dbkey: "opac-de-627",
+  opac: "https://opac.k10plus.de/",
   cocoda: "https://coli-conc.gbv.de/cocoda/app/",
   avram: "https://uri.gbv.de/avram-demo/", // TODO: change location!
   schemes: [ // TODO: load via API

@@ -40,18 +40,19 @@
         </tr>
       </tbody>
     </table>
-  </div>
     <h2>PICA-Datensatz</h2>
     <p>
       Abruf einzelner PICA-Datensätze und reduzierung auf Felder zur inhaltlichen Erschließung.
     </p>
-    <div>
-      <textarea id="pica-editor"/>
-      </textarea>
-      <label for="ppn">PPN:</label> <input type="text" id="ppn" value="161165839X" />
-      <button id="loadViaPPN">Datensatz aus K10Plus laden</button>
-      <!-- TODO: add link to OPAC -->
-    </div>
+    <form v-on:submit.prevent="loadRecord">
+      <input type="text" v-model="ppn" placeholder="PPN" />
+      <button type="submit">laden</button>
+      &nbsp;
+      <a v-if="record" v-bind:href="opac+'PPNSET?PPN='+ppn" target="opac">🡕 im OPAC</a>
+    </form>
+    <textarea id="pica-editor"/>
+    </textarea>
+  </div>
     <h2>Mappings</h2>
     <p>
       Passende Mappings zur im Datensatz gefundenen Erschließung:
