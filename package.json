@@ -1,8 +1,23 @@
 {
+  "name": "coli-rich",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gbv/coli-rich.git"
+  },
   "scripts": {
-    "start": "browser-sync start --server --files ."
+    "start": "browser-sync start --server --files .",
+    "test": "mocha --recursive"
+  },
+  "pre-commit": [
+    "test"
+  ],
+  "engines": {
+    "node" : ">=13.2"
   },
   "devDependencies": {
-    "browser-sync": "^2.26.12"
+    "browser-sync": "^2.26.12",
+    "mocha": "^8.1.1",
+    "pre-commit": "^1.2.2"
   }
 }

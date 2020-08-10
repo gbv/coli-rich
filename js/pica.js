@@ -9,15 +9,17 @@ export const serializePicaField = field =>
 export const serializePica = pica =>
     pica.map(serializePicaField).join("\n")
 
-// Partial PICA Path expression parser
 export class PicaPath {
     constructor(s) {
-        const match = s.match(/^([012.][0-9.][0-9.][A-Z@.])(\[(([0-9.]{2})|([0-9]{2}-[0-9]{2}))\])?/)
+        const match = s.match(
+            /^([012.][0-9.][0-9.][A-Z@.])(\[(([0-9.]{2})|([0-9]{2}-[0-9]{2}))\])?(\$([_A-Za-z0-9]+))?$/)
         if (!match) throw "Invalid PICA Path expression"
+
         this.tag = new RegExp("^"+match[1]+"$")
         this.occ = match[4] 
             ? new RegExp("^"+match[4]+"$") 
             : (match[5] ? match[5].split("-") : null)
+        this.sf  = match[7] ? new RegExp("^["+match[7]+"]$") : null
     }
 
     matchField(field) {
@@ -29,9 +31,26 @@ export class PicaPath {
             ? this.occ[0] <= occ && this.occ[1] >= occ
             : this.occ.test(occ)
     }
+
+    extractSubfields(field) {
+        return field.filter((_,i) => i>2 && i%2 && (!this.sf || this.sf.test(field[i-1])))
+    }
+
+    getFields(record) {
+        return record.filter(f => this.matchField(f))
+    }
+
+    getValues(record) {
+        return [].concat(...(this.getFields(record).map(f => this.extractSubfields(f))))
+    }
+
+    getUniqueValues(record) {
+        return [...new Set(this.getValues(record))]
+    }
 }
 
 export const filterPicaFields = (pica, expr) => {
-    expr = expr.split(/\|/).filter(e => e.length).map(e => new PicaPath(e))
+    expr = Array.isArray(expr) ? expr : expr.split(/\|/)
+    expr = expr.filter(e => e.length).map(e => new PicaPath(e))
     return pica.filter(field => expr.some(e => e.matchField(field)))
 }

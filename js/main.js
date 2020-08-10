@@ -1,4 +1,4 @@
-import { serializePica, filterPicaFields } from './pica.js'
+import { serializePica, filterPicaFields, PicaPath } from './pica.js'
 import config from './config.js'
 
 const fetchPica = ppn => 
@@ -13,6 +13,7 @@ config.picaPathField = s => {
     return s
 }
 
+
 const App = {
   data() {    
     return {
@@ -22,17 +23,30 @@ const App = {
     }
   },
   mounted: function () {
-    var editor = document.getElementById('pica-editor')
-    this.editor = CodeMirror.fromTextArea(editor, { lineNumbers: true });
+    this.editor = CodeMirror.fromTextArea(
+      document.getElementById('pica-editor'), { viewportMargin: Infinity })    
   },
   methods: {
     loadRecord() {
+      this.editor.setValue(this.record = "")
+      const indexing = document.getElementById('indexing')
+      indexing.innerHTML = ""
       fetchPica(this.ppn).then(pica => {
-        var expr = ['003@|',...pathes]
-        this.record = serializePica(filterPicaFields(pica, expr.join("|")))
+        var expr = ['003@',...pathes]
+
+        pica.push(["045G",null,'a','300'])
+
+        pica = filterPicaFields(pica, expr)
+        this.record = serializePica(pica)
         this.editor.setValue(this.record)
-      }).catch(e => {
-        this.editor.setValue(this.record = "")
+        
+        for (const kos of config.schemes) {
+            const path = new PicaPath(kos.PICAPATH)
+            const values = path.getUniqueValues(pica)
+            if (values.length) {
+                indexing.innerHTML += kos.notation[0]+": "+values+"<br>"
+            }
+        }
       })
     }
   }

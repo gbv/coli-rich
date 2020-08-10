@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <title>coli-rich</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/codemirror.min.css">
+  <link rel="stylesheet" href="css/main.css">
  </head>
  <body>
   <header>
@@ -42,16 +42,34 @@
     </table>
     <h2>PICA-Datensatz</h2>
     <p>
-      Abruf einzelner PICA-Datensätze und reduzierung auf Felder zur inhaltlichen Erschließung.
+      Abruf einzelner PICA-Datensätze und Reduzierung auf Felder zur inhaltlichen Erschließung.
     </p>
     <form v-on:submit.prevent="loadRecord">
-      <input type="text" v-model="ppn" placeholder="PPN" />
-      <button type="submit">laden</button>
-      &nbsp;
-      <a v-if="record" v-bind:href="opac+'PPNSET?PPN='+ppn" target="opac">🡕 im OPAC</a>
+      <table> 
+        <thead>
+          <tr>
+            <th colspan="2">
+              <input type="text" v-model="ppn" placeholder="PPN" />
+              <button type="submit">laden</button>
+              &nbsp;
+              <a v-if="record" v-bind:href="opac+'PPNSET?PPN='+ppn" target="opac">🡕 im OPAC</a>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <textarea id="pica-editor"/>
+              </textarea>
+            </td>
+            <td>
+              <ul id="indexing">
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </form>
-    <textarea id="pica-editor"/>
-    </textarea>
   </div>
     <h2>Mappings</h2>
     <p>
