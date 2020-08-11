@@ -1,3 +1,5 @@
+import { createApp } from 'vue'
+
 import { serializePica, filterPicaFields, PicaPath } from './pica.js'
 import config from './config.js'
 
@@ -14,21 +16,30 @@ config.picaPathField = s => {
 }
 
 
+//const HelloWorld = httpVueLoader('./js/components/HelloWorld.vue')
+/*
 const App = {
   data() {    
+    const ppn = "161165839X"
     return {
       ...config,
-      ppn: "161165839X",
-      record: ""
+      ppn,
+      record: `003@ $0${ppn}`
     }
   },
+  //components: { HelloWorld },
   mounted: function () {
-    this.editor = CodeMirror.fromTextArea(
-      document.getElementById('pica-editor'), { viewportMargin: Infinity })    
+    //this.editor = CodeMirror.fromTextArea(
+    //  document.getElementById('pica-editor'), { viewportMargin: Infinity })    
+    //this.editor.setValue
   },
   methods: {
+    setRecord(record) {
+      //this.editor.setValue(serializePica(this.record = record))
+    },
     loadRecord() {
-      this.editor.setValue(this.record = "")
+      this.setRecord([])
+
       const indexing = document.getElementById('indexing')
       indexing.innerHTML = ""
       fetchPica(this.ppn).then(pica => {
@@ -37,8 +48,7 @@ const App = {
         pica.push(["045G",null,'a','300'])
 
         pica = filterPicaFields(pica, expr)
-        this.record = serializePica(pica)
-        this.editor.setValue(this.record)
+        this.setRecord(pica)
         
         for (const kos of config.schemes) {
             const path = new PicaPath(kos.PICAPATH)
@@ -50,6 +60,8 @@ const App = {
       })
     }
   }
-}
+}*/
 
-Vue.createApp(App).mount("#app")
+import App from './components/App.vue'
+
+createApp(App).mount("#app")

@@ -9,6 +9,23 @@ export const serializePicaField = field =>
 export const serializePica = pica =>
     pica.map(serializePicaField).join("\n")
 
+// utility to write long regular expressions
+const regex = (...parts) => new RegExp(parts.map(r => r.source).join(''))
+const picaPlainLine = regex(
+    /^([012][0-9][0-9][A-Z@])/, // tag
+    /(\/([0-9]{2,3}))?/,        // occurrence
+    /\s*/,
+    /(\$([A-Za-z0-9]).+)+/
+)
+
+export const parsePica = text => text.split(/\n/).map(line => {
+    const match = line.match(picaPlainLine)
+    if (match) {
+        const sf = match[4].split(/\$([A-Za-z0-9])/).slice(1).map(s => s.replace(/\$\$/g,'$'))
+        return [ match[1], match[3], ...sf ] 
+    }
+}).filter(Boolean)
+
 export class PicaPath {
     constructor(s) {
         const match = s.match(
@@ -47,6 +64,11 @@ export class PicaPath {
     getUniqueValues(record) {
         return [...new Set(this.getValues(record))]
     }
+}
+
+const PPN = new PicaPath("003@$0")
+export function getPPN(record) {
+  return PPN.getValues(record)[0]
 }
 
 export const filterPicaFields = (pica, expr) => {

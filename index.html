@@ -12,72 +12,9 @@
     <h1>coli-rich</h1>
     <p>Kataloganreicherung mittels Konkordanzen</p>
   </header>
-  <p>
-    Die vorliegende Webseite demonstriert die Anreicherung inhaltlicher
-    Erschließung in PICA-Katalogen auf Grundlage von Konkordanzen im Rahmen
-    des <a href="https://coli-conc.gbv.de/">Projekt coli-conc</a>.
-  </p>
   <div id="app">
-    <h2>Vokabulare</h2>
-    <p>Mappings zwischen folgende Vokabulare werden unterstützt:</p>
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th colspan=2">Cocoda</th>
-          <th>PICA+</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="scheme in schemes">
-          <td>{{ scheme.notation[0] }}</td>
-          <td>{{ scheme.prefLabel.de }}</td>
-          <td><a v-bind:href="cocoda+'?fromScheme='+scheme.uri">↦ </a></td>
-          <td><a v-bind:href="cocoda+'?toScheme='+scheme.uri">⇥</a></td>
-          <td><a v-if="scheme.PICAPATH"
-                 v-bind:href="avram+'?field='+picaPathField(scheme.PICAPATH)">{{scheme.PICAPATH}}</a></td>
-        </tr>
-      </tbody>
-    </table>
-    <h2>PICA-Datensatz</h2>
-    <p>
-      Abruf einzelner PICA-Datensätze und Reduzierung auf Felder zur inhaltlichen Erschließung.
-    </p>
-    <form v-on:submit.prevent="loadRecord">
-      <table> 
-        <thead>
-          <tr>
-            <th colspan="2">
-              <input type="text" v-model="ppn" placeholder="PPN" />
-              <button type="submit">laden</button>
-              &nbsp;
-              <a v-if="record" v-bind:href="opac+'PPNSET?PPN='+ppn" target="opac">🡕 im OPAC</a>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <textarea id="pica-editor"/>
-              </textarea>
-            </td>
-            <td>
-              <ul id="indexing">
-              </ul>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </form>
   </div>
-    <h2>Mappings</h2>
-    <p>
-      Passende Mappings zur im Datensatz gefundenen Erschließung:
-      ... (TBD)
-    </p>
 </body>
-<script src="https://unpkg.com/vue@next"></script>
 <script src="js/codemirror.min.js"></script>
 <script src="js/codemirror-marc.js"></script>
 <script src="js/main.js" type="module"></script>

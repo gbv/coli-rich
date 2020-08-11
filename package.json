@@ -6,18 +6,22 @@
     "url": "git+https://github.com/gbv/coli-rich.git"
   },
   "scripts": {
-    "start": "browser-sync start --server --files .",
+    "dev": "vite",
+    "build": "vite build",
     "test": "mocha --recursive"
   },
   "pre-commit": [
     "test"
   ],
   "engines": {
-    "node" : ">=13.2"
+    "node": ">=13.2"
+  },
+  "dependencies": {
+    "vue": "^3.0.0-rc.5"
   },
   "devDependencies": {
-    "browser-sync": "^2.26.12",
     "mocha": "^8.1.1",
-    "pre-commit": "^1.2.2"
+    "pre-commit": "^1.2.2",
+    "vite": "^1.0.0-rc.4"
   }
 }

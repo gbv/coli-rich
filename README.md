@@ -2,17 +2,15 @@
 
 This repository contains a web application to demonstrate enrichment of PICA catalog records with subject indexing data from concordances.
 
-## Requirements
-
-The application requires a modern browser (at least from 2017) with support of ECMAScript 2015 (ES6). Unit tests require at least Node 13.2.
-
 ## Development
 
-During development start a webserver and browser using [browsersync](https://browsersync.io/):
+The application is written in ECMAScript 2015 (ES6) with [Vite].
+
+[vite]: https://github.com/vitejs/vite#readme
 
 ~~~sh
 npm i
-npm run start
+npm run dev
 ~~~
 
 Run tests

@@ -1,0 +1,65 @@
+<template>
+  <form v-on:submit.prevent="loadRecord">
+    <textarea ref="editor" v-model="text"></textarea>
+    <input type="text" v-model="ppn" placeholder="PPN" />
+    <button type="submit" :disabled="!ppn">laden</button>
+  </form>
+</template>
+
+<script>
+import { serializePica, parsePica, PicaPath, getPPN, filterPicaFields } from '../pica.js'
+
+function getTextChildren(nodes) {
+    return nodes.map(node => typeof node.children === 'string' ? node.children : '').join('')
+}
+
+// CodeMirror instance for PICA Plain
+export default {
+  props: [
+      // unAPI base URL to load records from
+      "unapi", 
+      // database key to load records from via unAPI
+      "dbkey",
+      // list of PICA Path expressions to filter loaded records
+      "fields"
+  ],
+  data: function() {
+    return {
+      text: '',
+      record: [],
+      ppn: null,
+    }
+  },
+  created() {
+    this.$watch('record', record => { 
+      this.ppn = getPPN(record) || this.ppn
+      this.$emit("change", { record, ppn: this.ppn })
+    })
+    this.setText(getTextChildren(this.$slots.default()))
+  },
+  mounted: function() {
+    this.editor = CodeMirror.fromTextArea(this.$refs.editor, {})
+    this.editor.on('change', editor => this.setText(editor.getValue()))
+  },
+  methods: {
+    setText(text) {
+      this.text = text
+      this.record = parsePica(text)
+    },
+    setRecord(record) {
+      this.record = record
+      this.text = serializePica(record)
+      this.editor.setValue(this.text)
+    },
+    loadRecord() {
+      fetch(`${this.unapi}?format=picajson&id=${this.dbkey}:ppn:${this.ppn}`)
+      .then(response => response.ok ? response.json() : null)
+      .then(record => {
+         if (record) {
+           this.setRecord(this.fields ? filterPicaFields(record, this.fields) : record)
+         }
+      })
+    }
+  }
+}
+</script>
