@@ -1,6 +1,6 @@
-// MARC/PICA mode for CodeMirror
+import CodeMirror from 'codemirror'
 
-(function(CodeMirror) {
+// MARC/PICA mode for CodeMirror
 
 CodeMirror.defineMode("marc", function() {
 
@@ -12,7 +12,6 @@ CodeMirror.defineMode("marc", function() {
     subfield: 'comment',
     code: 'keyword',
     indicators: 'variable-2',
-    //value: 'number',
     length: 'comment',
     prefix: 'comment',
   }
@@ -148,4 +147,5 @@ CodeMirror.defineMode("marc", function() {
     }
   }
 })
-})(CodeMirror);
+
+export default {}

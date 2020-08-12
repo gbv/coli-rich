@@ -1,19 +1,23 @@
 <template>
   <form v-on:submit.prevent="loadRecord">
     <textarea ref="editor" v-model="text"></textarea>
-    <input type="text" v-model="ppn" placeholder="PPN" />
-    <button type="submit" :disabled="!ppn">laden</button>
+    <div v-if="unapi && dbkey">
+      <input type="text" v-model="ppn" placeholder="PPN" />
+      <button type="submit" :disabled="!ppn">laden</button>
+    </div>
   </form>
 </template>
 
 <script>
 import { serializePica, parsePica, PicaPath, getPPN, filterPicaFields } from '../pica.js'
+import CodeMirror from 'codemirror'
+import CodeMirrorMarc from '../codemirror-marc.js'
 
 function getTextChildren(nodes) {
     return nodes.map(node => typeof node.children === 'string' ? node.children : '').join('')
 }
 
-// CodeMirror instance for PICA Plain
+// CodeMirror instance for PICA Plain records
 export default {
   props: [
       // unAPI base URL to load records from
@@ -63,3 +67,12 @@ export default {
   }
 }
 </script>
+
+<style>
+@import '../../css/codemirror.min.css';
+
+.CodeMirror {
+  border: 1px solid #ddd;
+  height: auto;
+}
+</style>

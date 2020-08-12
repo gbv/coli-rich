@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --base /coli-rich",
     "test": "mocha --recursive"
   },
   "pre-commit": [
@@ -17,6 +17,7 @@
     "node": ">=13.2"
   },
   "dependencies": {
+    "codemirror": "^5.56.0",
     "vue": "^3.0.0-rc.5"
   },
   "devDependencies": {

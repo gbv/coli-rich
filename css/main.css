@@ -27,7 +27,4 @@ td, th {
   padding: 0.2em 0.5em;
   border: 1px solid #ddd;
 }
-.CodeMirror {
-  border: 1px solid #ddd;
-  height: auto;
-}
+

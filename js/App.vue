@@ -60,7 +60,7 @@
           <td><a v-bind:href="cocoda+'?toScheme='+scheme.uri">⇥</a></td>
           <td>
               <a v-if="scheme.PICAFIELD"
-                 v-bind:href="avram+'?field='+picaPathField(scheme.PICAPATH)">{{scheme.PICAPATH}}</a>
+                 v-bind:href="avram+'?field='+scheme.PICAFIELD">{{scheme.PICAPATH}}</a>
           </td>
         </tr>
       </tbody>
@@ -69,12 +69,12 @@
 </template>
 
 <script>
-import PicaEditor from './PicaEditor.vue'
-import ConceptList from './ConceptList.vue'
+import PicaEditor from './components/PicaEditor.vue'
+import ConceptList from './components/ConceptList.vue'
 
-import { ConceptScheme } from '../concept-scheme.js' 
-import { PicaPath } from '../pica.js'
-import config from '../config.js'
+import { ConceptScheme } from './concept-scheme.js' 
+import { PicaPath } from './pica.js'
+import config from './config.js'
 
 const fieldFilter = [
     '003@',
@@ -151,7 +151,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+@import '../css/main.css';
+
 ul {
   padding-left: 0;
   list-style-type: none;
