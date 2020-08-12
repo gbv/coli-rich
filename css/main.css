@@ -1,6 +1,9 @@
 body {
   font-family: Sans-Serif;
 }
+section {
+  padding-bottom: 1em;
+}
 header h1 { 
   margin-bottom: 0; 
 }
@@ -27,4 +30,9 @@ td, th {
   padding: 0.2em 0.5em;
   border: 1px solid #ddd;
 }
-
+a {
+  text-decoration: none;   
+}
+a:hover {
+  text-decoration: underline;   
+}

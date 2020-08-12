@@ -39,6 +39,15 @@ export class PicaPath {
         this.sf  = match[7] ? new RegExp("^["+match[7]+"]$") : null
     }
 
+    get tagString() {
+        return this.tag.source.substring(1, this.tag.source.length-1)
+    }
+
+    get subfieldString() {
+        const source = this.sf ? this.sf.source : ''
+        return source.substring(2,source.length-2)
+    }
+
     matchField(field) {
         const [tag, occ] = field
         if (!this.tag.test(tag)) { return false }
