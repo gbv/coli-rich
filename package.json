@@ -5,6 +5,7 @@
     "type": "git",
     "url": "git+https://github.com/gbv/coli-rich.git"
   },
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build --base /coli-rich",
