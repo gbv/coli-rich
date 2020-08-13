@@ -8,6 +8,10 @@
         <td>
           <ul v-if="m.to && m.to.memberSet.length">
             <li v-for="concept in m.to.memberSet">
+              <span v-if="(concept.inScheme||[]).length && concept.inScheme[0].notation">
+                {{concept.inScheme[0].notation[0]}}
+                &nbsp;
+              </span>
               <concept-link :concept="concept"/>
             </li>
           </ul>

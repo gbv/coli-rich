@@ -18,17 +18,17 @@
           <th>Felder</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody>          
         <tr v-for="scheme in schemes">
-          <td><input type="radio" v-model="fromScheme" v-bind:value="scheme.uri"></td>
-          <td><input type="radio" v-model="toScheme" v-bind:value="scheme.uri"></td>
+          <td><input type="checkbox" v-model="fromScheme" v-bind:value="scheme.uri"></td>
+          <td><input type="checkbox" v-model="toScheme" v-bind:value="scheme.uri"></td>
           <td>{{ scheme.notation[0] }}</td>
           <td>{{ scheme.prefLabel.de }}</td>
           <td><a v-bind:href="cocoda+'?fromScheme='+scheme.uri">↦ </a></td>
           <td><a v-bind:href="cocoda+'?toScheme='+scheme.uri">⇥</a></td>
           <td>
               <a v-if="scheme.PICAFIELD"
-                 v-bind:href="avram+'?field='+scheme.PICAFIELD">{{scheme.PICAPATH}}</a>
+                 v-bind:href="avram+'?field='+scheme.PICAFIELD">{{scheme.PICAPATH.toString}}</a>
           </td>
         </tr>
       </tbody>
@@ -59,8 +59,8 @@
               </div>
             </td>
             <td>
-              <table v-if="bundles">
-                <tbody v-for="(set, uri) in bundles">
+              <table v-if="indexing">
+                <tbody v-for="(set, uri) in indexing">
                   <tr v-for="concept in set">
                     <td>{{schemes[uri].notation[0]}}</td>
                     <td><concept-link :concept="concept"/></td>
@@ -75,7 +75,6 @@
         </tbody>
       </table>
   </section>
-
 </template>
 
 <script>
@@ -86,6 +85,9 @@ import ConceptLink from './components/ConceptLink.vue'
 import { ConceptScheme } from './concept-scheme.js' 
 import { PicaPath, serializePica } from './pica.js'
 import config from './config.js'
+import { enrichIndexing, indexingToPica } from './enrich-indexing.js'
+
+import { isEmpty } from './utils.js'
 
 const fieldFilter = [
     '003@',
@@ -101,9 +103,14 @@ export default {
   },
   data() {
     const schemes = {}       
+    const fromScheme = []
+    const toScheme = []
     config.schemes.forEach(kos => {
       if (kos.PICAPATH) {
-        kos.PICAFIELD = kos.PICAPATH.split("$")[0].replace(/\[(.+)\]/,"/$1")
+        kos.PICAPATH = new PicaPath(kos.PICAPATH)
+        kos.PICAFIELD = kos.PICAPATH.tagString.replace(/\[(.+)\]/,"/$1")
+        fromScheme.push(kos.uri)
+        toScheme.push(kos.uri)
       }
       schemes[kos.uri] = new ConceptScheme(kos)
     })
@@ -113,15 +120,15 @@ export default {
       recordText: '003@ $0161165839X', // inital example record
       ppn: '',
       fieldFilter,
-      fromScheme: null,
-      toScheme: null,
-      bundles: {},
+      fromScheme,
+      toScheme,
+      indexing: {},
       mappings: [],
       enriched: ""
     }
   },
   created() {
-    this.$watch('bundles', () => this.getMappings())
+    this.$watch('indexing', () => this.getMappings())
     this.$watch('fromScheme', () => this.getMappings())
     this.$watch('toScheme', () => this.getMappings())
   },
@@ -130,72 +137,62 @@ export default {
       const record = ev.record || []
       this.ppn = ev.ppn
 
-      const bundles = {}
+      const indexing = {}
       for (const kos of Object.values(this.schemes)) {
           var conceptSet = []
           if (kos.PICAPATH) {
-              const path = new PicaPath(kos.PICAPATH)
+              const path = kos.PICAPATH
               const values = path.getUniqueValues(record)
               if (values.length) {
                   conceptSet = values.map(n => kos.conceptFromNotation(n, { inScheme: true })).filter(Boolean)
-                bundles[kos.uri] = conceptSet
+                indexing[kos.uri] = conceptSet
               }
           }
-//          this.bundles[kos.uri] = conceptSet
       }        
-      this.bundles = bundles
+      this.indexing = indexing
     },
     getMappings() {
-      Object.values(this.bundles).forEach(concepts => concepts.forEach(c => c.mappings = []))
+      const { toScheme, indexing } = this
 
-      const { fromScheme, toScheme } = this
-
-      var fromList = this.bundles[fromScheme]
-      if (!fromList || !toScheme) return
-
-      Promise.all( fromList.map(concept => {
-          const from = concept.uri
-          const query = { fromScheme, toScheme, from }
-
-          return this.fetchMappings(query).then(mappings => {
-              return concept.mappings = mappings              
-          })
-      }) ).then(mappings => {
-          this.enrich(mappings)
+      const fromScheme = []
+      const from = {}
+      this.fromScheme.forEach(scheme => {
+        if (!isEmpty(indexing[scheme])) {
+          fromScheme.push(scheme)
+          indexing[scheme].forEach(c => from[c.uri] = c)
+        }
       })
-    },
-    enrich(mappings) {
-      // trivial strategy: just take the first mapping of each source concept
-      mappings = [...mappings.map(m => m[0])]
+      if (isEmpty(from)) return
 
-      var add = []
-      var pathes = {}
+      Object.values(from).forEach(c => c.mappings = [])
 
-      mappings.filter(Boolean).forEach(m => {
-          const toScheme = this.schemes[m.toScheme.uri]          
+      // TODO: support type and partOf
+      const query = {
+          fromScheme: fromScheme.join('|'),
+          from:       Object.keys(from).join('|'),
+          toScheme:   toScheme.join('|'),
+      }
 
-          // skip if KOS is already used
-          if ((this.bundles[toScheme.uri] || []).length) {
-            return
+      return this.fetchMappings(query).then(mappings => {
+        // add 'inScheme'
+        mappings.forEach(m => {
+          m.from.memberSet.forEach(c => {
+              if (!from[c.uri]) { 
+                  console.log(c.uri)
+                } else {
+            from[c.uri].mappings.push(m)
+                }
+          })          
+          if (m.to && m.to.memberSet) { 
+              m.to.memberSet.forEach(c => c.inScheme = [m.toScheme])
           }
+        })
 
-          // TODO: take into account mapping type
-
-          // only respect 1-to-1-mappings
-          if (m.to.memberSet.length !== 1) return
-
-          const notation = m.to.memberSet[0].notation[0]
-          const source = m.uri
-
-          var path = pathes[toScheme.uri] || (pathes[toScheme.uri]=new PicaPath(toScheme.PICAPATH))
-
-          var occ = "" // TODO: occurrence from path (count in ranges)
-          var pica = [path.tagString, occ]
-          pica.push(path.subfieldString, notation, 'A', source)
-          add.push(pica)
+        const add = enrichIndexing(indexing)
+        const pica = serializePica(indexingToPica(add, this.schemes))
+        this.enriched = pica
+        console.log(pica)
       })
-      
-      this.enriched = serializePica(add)
     },
     fetchMappings(query) {
       return fetch(`${this.mappingApi}?` + new URLSearchParams(query))

@@ -43,9 +43,28 @@ export class PicaPath {
         return this.tag.source.substring(1, this.tag.source.length-1)
     }
 
+    get startOccurrence() {
+        return Array.isArray(this.occ) ? this.occ[0] : null
+    }
+
+    get endOccurrence() {
+        return Array.isArray(this.occ) ? this.occ[1] : null
+    }
+
+    get occurrenceString() {
+        if (Array.isArray(this.occ)) return this.occ.join('-')
+        return this.occf ? this.occ.source.substr(1,this.occ.source.length-1) : ''
+    }
+
     get subfieldString() {
         const source = this.sf ? this.sf.source : ''
         return source.substring(2,source.length-2)
+    }
+
+    get toString() {
+        return this.tagString
+            + (this.occ ? '/' + this.occurrenceString : '')
+            + (this.sf ? '$' + this.subfieldString : '')
     }
 
     matchField(field) {

@@ -39,6 +39,7 @@ export default {
       this.ppn = getPPN(record) || this.ppn
       this.$emit("change", { record, ppn: this.ppn })
     })
+    // FIXME: change in slot is not detected!
     this.setText(getTextChildren(this.$slots.default()))
   },
   mounted: function() {
