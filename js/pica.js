@@ -101,6 +101,6 @@ export function getPPN(record) {
 
 export const filterPicaFields = (pica, expr) => {
     expr = Array.isArray(expr) ? expr : expr.split(/\|/)
-    expr = expr.filter(e => e.length).map(e => new PicaPath(e))
+    expr = expr.map(e => e instanceof PicaPath ? e : new PicaPath(e))
     return pica.filter(field => expr.some(e => e.matchField(field)))
 }

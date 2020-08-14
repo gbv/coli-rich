@@ -56,8 +56,11 @@ export default {
       this.text = serializePica(record)
       this.editor.setValue(this.text)
     },
+    setPPN(ppn) {
+      this.ppn = ppn
+    },
     loadRecord() {
-      fetch(`${this.unapi}?format=picajson&id=${this.dbkey}:ppn:${this.ppn}`)
+      fetch(`${this.unapi}?format=picajson&id=${this.dbkey}:ppn:${this.ppn}`)        
       .then(response => response.ok ? response.json() : null)
       .then(record => {
          if (record) {

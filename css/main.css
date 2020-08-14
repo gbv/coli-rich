@@ -30,9 +30,26 @@ td, th {
   padding: 0.2em 0.5em;
   border: 1px solid #ddd;
 }
+caption {
+  font-weight: bold;
+}
 a {
   text-decoration: none;   
 }
 a:hover {
   text-decoration: underline;   
+}
+ul.inline {
+  display: inline;
+  list-style: none;
+  padding: 0px;
+}
+ul.inline li {
+  display: inline;
+}
+ul.inline li:after {
+  content: ", ";
+}
+ul.inline li:last-child:after {
+  content: "";
 }

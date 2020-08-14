@@ -42,7 +42,7 @@ export function indexingToPica(indexing, schemes) {
   for (const schemeUri in indexing) {
     const scheme = schemes[schemeUri]    
 
-    if (!scheme || !scheme.PICAPATH) return
+    if (!scheme || !scheme.PICAPATH) continue
     const path = scheme.PICAPATH instanceof PicaPath 
                ? scheme.PICAPATH : new PicaPath(scheme.PICAPATH)
 

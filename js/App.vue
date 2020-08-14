@@ -3,11 +3,12 @@
     <p>
       Aus im Rahmen von <a href="https://coli-conc.gbv.de/">coli-conc</a> gesammelten
       Konkordanzen lässt sich die inhaltliche Erschließung von PICA-Datensätzen
-      anreichern. Mappings werden von <a v-bind:href="mappingApi">der Mappings-API</a>
-      abgerufen.
-      Unterstütze Vokabulare:
+      anreichern.
     </p>
+  </section>
+  <section v-if="!isEmpty(schemes)">
     <table>
+      <caption>Unterstützte Vokabulare</caption>
       <thead>
         <tr>
           <th>↦ </th>
@@ -16,6 +17,7 @@
           <th>Name</th>
           <th colspan="2">Cocoda</th>
           <th>Felder</th>
+          <th>Notation</th>
         </tr>
       </thead>
       <tbody>          
@@ -30,51 +32,77 @@
               <a v-if="scheme.PICAFIELD"
                  v-bind:href="avram+'?field='+scheme.PICAFIELD">{{scheme.PICAPATH.toString}}</a>
           </td>
+          <td v-if="scheme.notationPattern">{{scheme.notationPattern}}</td>
         </tr>
       </tbody>
     </table>
   </section>
   <section>
-      <table> 
-        <thead>
-          <tr>
-            <th>
-              Datensatz (in PICA+)
-            </th>
-            <th>
-              Erschließung
-              <a v-if="ppn" v-bind:href="opac+'PPNSET?PPN='+ppn" target="opac">🡕 Katalog</a>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="vertical-align: top;">
-              <PicaEditor :unapi="unapi" :dbkey="dbkey" :fields="fieldFilter"
-                           @change="recordChanged"
-              >{{recordText}}</PicaEditor>
-              <div v-if="enriched" style="padding-top: 0.5em;">
-                Anreicherung:
-                <PicaEditor>{{enriched}}</PicaEditor>
-              </div>
-            </td>
-            <td>
-              <table v-if="indexing">
-                <tbody v-for="(set, uri) in indexing">
-                  <tr v-for="concept in set">
-                    <td>{{schemes[uri].notation[0]}}</td>
-                    <td><concept-link :concept="concept"/></td>
-                    <td v-if="(concept.mappings||[]).length">
-                      <mapping-list :mappings="concept.mappings"/>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+   <table> 
+     <thead>
+       <tr>
+         <th>
+           Datensatz (nur Erschließungsfelder und PPN)
+           <a v-if="ppn" v-bind:href="opac+'PPNSET?PPN='+ppn" target="opac">🡕 Katalog</a>
+         </th>
+       </tr>
+     </thead>
+     <tbody>
+       <tr>
+         <td style="vertical-align: top;">
+           <PicaEditor :unapi="unapi" :dbkey="dbkey" :fields="fieldFilter"
+                        @change="recordChanged" ref="recordEditor"
+           >{{recordText}}</PicaEditor>
+           <div v-if="examples && examples.length" style="font-size: smaller; padding-top: 0.2em;">
+             Beispiele:
+             <ul class="inline">
+               <li v-for="ex in examples">
+                 <a @click="loadRecord(ex)">{{ex}}</a>
+               </li>
+             </ul>
+           </div>
+           <div v-if="enriched" style="padding-top: 0.5em;">
+             Anreicherung:
+             <PicaEditor>{{enriched}}</PicaEditor>
+           </div>
+         </td>
+        </tr>
+      </tbody>
+    </table>         
   </section>
+  <section>
+    <table> 
+     <thead v-if="!isEmpty(indexing)">
+       <tr>
+         <th>
+           Erschließung und Mappings
+         </th>
+       </tr>
+      </thead>
+      <tbody v-if="!isEmpty(indexing)">
+        <tr>
+         <td>
+           <table>
+             <tbody v-for="(set, uri) in indexing">
+               <tr v-for="concept in set">
+                 <td>{{schemes[uri].notation[0]}}</td>
+                 <td><concept-link :concept="concept"/></td>
+                 <td v-if="(concept.mappings||[]).length">
+                   <mapping-list :mappings="concept.mappings"/>
+                 </td>
+               </tr>
+             </tbody>
+           </table>
+         </td>
+       </tr>
+     </tbody>
+   </table>
+  </section>
+    <p>
+      Mappings werden von <a v-bind:href="mappingApi">der Mappings-API</a>
+      abgerufen.
+    </p>
+
 </template>
 
 <script>
@@ -87,12 +115,14 @@ import { PicaPath, serializePica } from './pica.js'
 import config from './config.js'
 import { enrichIndexing, indexingToPica } from './enrich-indexing.js'
 
-import { isEmpty } from './utils.js'
+import { isEmpty, fetchJSON } from './utils.js'
 
-const fieldFilter = [
-    '003@',
-    ...Object.values(config.schemes).map(s => s.PICAPATH).filter(Boolean)
-]
+function completeMapping(m) {
+  if (!m.type) m.type = ["http://www.w3.org/2004/02/skos/core#mappingRelation"]
+  if (!m.from) m.from = {}
+  if (!m.to) m.to = {}
+  (m.to.memberSet||[]).forEach(c => c.inScheme = [m.toScheme])
+}
 
 export default {
   components: { PicaEditor, ConceptLink, MappingList },
@@ -102,54 +132,66 @@ export default {
     }
   },
   data() {
-    const schemes = {}       
-    const fromScheme = []
-    const toScheme = []
-    config.schemes.forEach(kos => {
-      if (kos.PICAPATH) {
-        kos.PICAPATH = new PicaPath(kos.PICAPATH)
-        kos.PICAFIELD = kos.PICAPATH.tagString.replace(/\[(.+)\]/,"/$1")
-        fromScheme.push(kos.uri)
-        toScheme.push(kos.uri)
-      }
-      schemes[kos.uri] = new ConceptScheme(kos)
-    })
     return {
       ...config,
-      schemes,
       recordText: '003@ $0161165839X', // inital example record
       ppn: '',
-      fieldFilter,
-      fromScheme,
-      toScheme,
+      schemes: {},
+      fromScheme: [],
+      toScheme: [],
+      schemes: {},
       indexing: {},
       mappings: [],
-      enriched: ""
+      record: [],
+      enriched: "",
+      fieldFilter: ['....'],
     }
   },
   created() {
     this.$watch('indexing', () => this.getMappings())
     this.$watch('fromScheme', () => this.getMappings())
     this.$watch('toScheme', () => this.getMappings())
+    this.loadSchemes()
   },
   methods: {
-    recordChanged(ev) {    
-      const record = ev.record || []
-      this.ppn = ev.ppn
-
+    isEmpty,
+    loadSchemes() {
+      const schemes = {}
+      fetchJSON("schemes.json").then(array => {
+        (array||[]).filter(s => s.PICAPATH && s.notation).forEach(scheme => {
+          const { uri } = scheme
+          scheme.PICAPATH = new PicaPath(scheme.PICAPATH)
+          scheme.PICAFIELD = scheme.PICAPATH.tagString.replace(/\[(.+)\]/,"/$1")
+          schemes[uri] = new ConceptScheme(scheme)
+        })
+        this.schemes = schemes
+        this.fromScheme = Object.values(schemes).map(s => s.uri)
+        this.toScheme   = Object.values(schemes).map(s => s.uri)
+        this.fieldFilter = ['003@',...Object.values(schemes).map(s => s.PICAPATH)]
+        this.updateIndexing()
+      })
+    },
+    updateIndexing() {
       const indexing = {}
       for (const kos of Object.values(this.schemes)) {
           var conceptSet = []
-          if (kos.PICAPATH) {
-              const path = kos.PICAPATH
-              const values = path.getUniqueValues(record)
-              if (values.length) {
-                  conceptSet = values.map(n => kos.conceptFromNotation(n, { inScheme: true })).filter(Boolean)
-                indexing[kos.uri] = conceptSet
-              }
+          const path = kos.PICAPATH
+          const values = path.getUniqueValues(this.record)
+          if (values.length) {
+              conceptSet = values.map(n => kos.conceptFromNotation(n, { inScheme: true })).filter(Boolean)
+            indexing[kos.uri] = conceptSet
           }
       }        
       this.indexing = indexing
+    },
+    loadRecord(ppn) {
+      this.$refs.recordEditor.setPPN(ppn)
+      this.$refs.recordEditor.loadRecord()
+    },
+    recordChanged(ev) {   
+      this.ppn = ev.ppn
+      this.record = ev.record || []
+      this.updateIndexing()
     },
     getMappings() {
       const { toScheme, indexing } = this
@@ -166,7 +208,8 @@ export default {
 
       Object.values(from).forEach(c => c.mappings = [])
 
-      // TODO: support type and partOf
+      // TODO: support querying by type and partOf
+
       const query = {
           fromScheme: fromScheme.join('|'),
           from:       Object.keys(from).join('|'),
@@ -174,29 +217,22 @@ export default {
       }
 
       return this.fetchMappings(query).then(mappings => {
-        // add 'inScheme'
         mappings.forEach(m => {
-          m.from.memberSet.forEach(c => {
-              if (!from[c.uri]) { 
-                  console.log(c.uri)
-                } else {
-            from[c.uri].mappings.push(m)
-                }
-          })          
-          if (m.to && m.to.memberSet) { 
-              m.to.memberSet.forEach(c => c.inScheme = [m.toScheme])
-          }
-        })
+          const s = this.schemes[m.toScheme.uri]
+          if (s) m.toScheme.notation = s.notation
 
-        const add = enrichIndexing(indexing)
-        const pica = serializePica(indexingToPica(add, this.schemes))
+          completeMapping(m);
+
+          (m.from.memberSet||[]).forEach(c => from[c.uri].mappings.push(m))
+        })
+        var add = enrichIndexing(indexing)
+        add = indexingToPica(add, this.schemes)
+        const pica = serializePica(add)
         this.enriched = pica
-        console.log(pica)
       })
     },
     fetchMappings(query) {
-      return fetch(`${this.mappingApi}?` + new URLSearchParams(query))
-        .then(response => response.ok ? response.json() : null)
+      return fetchJSON(`${this.mappingApi}?` + new URLSearchParams(query))
     }
   }
 }

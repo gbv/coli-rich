@@ -8,11 +8,16 @@
         <td>
           <ul v-if="m.to && m.to.memberSet.length">
             <li v-for="concept in m.to.memberSet">
-              <span v-if="(concept.inScheme||[]).length && concept.inScheme[0].notation">
-                {{concept.inScheme[0].notation[0]}}
-                &nbsp;
+              <span v-if="m.toScheme && m.toScheme.notation" class="scheme">
+                {{m.toScheme.notation[0]}}
               </span>
               <concept-link :concept="concept"/>
+              <span v-if="(m.creator||[]).length" class="secondary">
+                 by <concept-link :concept="m.creator[0]"/>
+              </span>
+              <span v-if="m.created" class="secondary">
+                at {{m.created}}
+              </span>
             </li>
           </ul>
         </td>
@@ -40,6 +45,12 @@ export default {
 </script>
 
 <style scoped>
+.secondary {
+  font-size: smaller;
+}
+.scheme {
+  padding-right: 0.5em;
+}
 ul {
   list-style-type: none;
 }
