@@ -3,7 +3,7 @@
     <p>
       Aus im Rahmen von <a href="https://coli-conc.gbv.de/">coli-conc</a> gesammelten
       Konkordanzen lässt sich die inhaltliche Erschließung von PICA-Datensätzen
-      anreichern.
+      anreichern. An dieser Stelle kann die automatische Anreicherung ausprobiert werden.
     </p>
   </section>
   <section v-if="!isEmpty(schemes)">
@@ -17,7 +17,7 @@
           <th>Name</th>
           <th colspan="2">Cocoda</th>
           <th>Felder</th>
-          <th>Notation</th>
+          <th>Valide Notationen</th>
         </tr>
       </thead>
       <tbody>          
@@ -36,21 +36,31 @@
         </tr>
       </tbody>
     </table>
+    <p>
+      <em>Nicht aufgeführte Vokabulare, (Unter)Felder und invalide Notationen werden ignoriert!</em>
+    </p>
   </section>
   <section>
    <table> 
      <thead>
-       <tr>
-         <th>
-           Datensatz (nur Erschließungsfelder und PPN)
-           <a v-if="ppn" v-bind:href="opac+'PPNSET?PPN='+ppn" target="opac">🡕 Katalog</a>
-         </th>
-       </tr>
+       <tr><th>Datensatz</th></tr>
      </thead>
      <tbody>
        <tr>
+         <td>
+           <ul class="inline">
+             <li v-for="(db, key) in databases">
+               <input type="radio" v-bind:value="key" v-model="dbkey" style="margin-right:0.5em;"/>   
+               <concept-link :concept="db"/>
+               <a v-bind:href="db.picabase" v-if="db.picabase">&nbsp;🡕 Katalog</a>
+             </li>
+           </ul>
+         </td>
+       </tr>
+       <tr>
          <td style="vertical-align: top;">
-           <PicaEditor :unapi="unapi" :dbkey="dbkey" :fields="fieldFilter"
+           <PicaEditor :unapi="unapi" :dbkey="dbkey" 
+                       :fields="fieldFilter" :picabase="databases[dbkey].picabase"
                         @change="recordChanged" ref="recordEditor"
            >{{recordText}}</PicaEditor>
            <div v-if="examples && examples.length" style="font-size: smaller; padding-top: 0.2em;">
@@ -61,10 +71,16 @@
                </li>
              </ul>
            </div>
-           <div v-if="enriched" style="padding-top: 0.5em;">
-             Anreicherung:
-             <PicaEditor>{{enriched}}</PicaEditor>
-           </div>
+          </td>
+       </tr>
+     </tbody>
+     <thead v-if="enriched">
+       <tr><th>Ermittelte Anreicherung</th></tr>
+     </thead>
+     <tbody v-if="enriched">
+       <tr>
+         <td>
+           <PicaEditor>{{enriched}}</PicaEditor>
          </td>
         </tr>
       </tbody>
@@ -75,7 +91,7 @@
      <thead v-if="!isEmpty(indexing)">
        <tr>
          <th>
-           Erschließung und Mappings
+           Ermittelte Erschließung und Mappings
          </th>
        </tr>
       </thead>
@@ -151,6 +167,7 @@ export default {
     this.$watch('indexing', () => this.getMappings())
     this.$watch('fromScheme', () => this.getMappings())
     this.$watch('toScheme', () => this.getMappings())
+    this.$watch('schemes', () => this.updateIndexing())
     this.loadSchemes()
   },
   methods: {
@@ -164,12 +181,20 @@ export default {
           scheme.PICAFIELD = scheme.PICAPATH.tagString.replace(/\[(.+)\]/,"/$1")
           schemes[uri] = new ConceptScheme(scheme)
         })
-        this.schemes = schemes
         this.fromScheme = Object.values(schemes).map(s => s.uri)
         this.toScheme   = Object.values(schemes).map(s => s.uri)
         this.fieldFilter = ['003@',...Object.values(schemes).map(s => s.PICAPATH)]
-        this.updateIndexing()
+        this.schemes = schemes
       })
+    },
+    loadRecord(ppn) {
+      this.$refs.recordEditor.setPPN(ppn)
+      this.$refs.recordEditor.loadRecord()
+    },
+    recordChanged(ev) {   
+      this.ppn = ev.ppn
+      this.record = ev.record || []
+      this.updateIndexing()
     },
     updateIndexing() {
       const indexing = {}
@@ -183,15 +208,6 @@ export default {
           }
       }        
       this.indexing = indexing
-    },
-    loadRecord(ppn) {
-      this.$refs.recordEditor.setPPN(ppn)
-      this.$refs.recordEditor.loadRecord()
-    },
-    recordChanged(ev) {   
-      this.ppn = ev.ppn
-      this.record = ev.record || []
-      this.updateIndexing()
     },
     getMappings() {
       const { toScheme, indexing } = this

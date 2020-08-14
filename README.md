@@ -2,7 +2,14 @@
 
 [![Build Status](https://travis-ci.org/gbv/coli-rich.svg?branch=master)](https://travis-ci.org/gbv/coli-rich)
 
-This repository contains a web application to illustrate enrichment of PICA catalog records with subject indexing data from concordances. The web interface is in German and deployed automatically at <https://gbv.github.io/coli-rich/>.
+This repository contains a web application to illustrate and analyze the enrichment of PICA catalog records with subject indexing data from concordances collected in [project coli-conc](https://coli-conc.gbv.de/). The application consists of:
+
+* A web interface in German, deployed automatically at <https://gbv.github.io/coli-rich/>
+* A web service (not deployed yet)
+
+## Usage
+
+Try out the web interface at <https://gbv.github.io/coli-rich/>.
 
 ## Development
 

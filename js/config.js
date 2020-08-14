@@ -2,10 +2,17 @@ export default
 {
   // where to load records from
   unapi: "https://unapi.k10plus.de/",
+  databases: {
+    "opac-de-627": {
+      prefLabel: { de: "K10Plus" },
+      picabase: "https://opac.k10plus.de/"
+    },
+    "test-k10plus-kxpt": {
+      picabase: "https://kxpt.k10plus.de/DB=1.1/",
+      prefLabel: { de: "K10plus-Test (kxpt)" }
+    }
+  },
   dbkey: "opac-de-627",
-
-  // link into catalog
-  opac: "https://opac.k10plus.de/",
 
   // link into Cocoda
   cocoda: "https://coli-conc.gbv.de/cocoda/app/",
@@ -16,7 +23,8 @@ export default
 
   examples: [
       "1673636357",
-      "168675535X" // only DDC and LCC
+      "168675535X", // only DDC and LCC
+      "786733772",
   ]
     /*
     {

@@ -4,6 +4,8 @@
     <div v-if="unapi && dbkey">
       <input type="text" v-model="ppn" placeholder="PPN" />
       <button type="submit" :disabled="!ppn">laden</button>
+      <a v-if="ppn && picabase" 
+         v-bind:href="picabase+'PPNSET?PPN='+ppn" target="opac">&nbsp;🡕 im Katalog</a>
     </div>
   </form>
 </template>
@@ -25,7 +27,9 @@ export default {
       // database key to load records from via unAPI
       "dbkey",
       // list of PICA Path expressions to filter loaded records
-      "fields"
+      "fields",
+      // base URL of catalog to link into
+      "picabase"
   ],
   data: function() {
     return {
