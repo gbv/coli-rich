@@ -87,6 +87,13 @@
     </table>         
   </section>
   <section>
+    <p>
+      <em>
+        Momentan werden alle vorhandenen 1-zu-1 Mappings berücksichtigt!
+        Für Vokabulare mit denen schon Erschließung vorhanden ist, wird
+        keine weitere Anreicherung ermittelt.
+      </em>
+    </p>
     <table> 
      <thead v-if="!isEmpty(indexing)">
        <tr>
