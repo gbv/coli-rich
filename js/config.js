@@ -5,12 +5,12 @@ export default
   databases: {
     "opac-de-627": {
       prefLabel: { de: "K10Plus" },
-      picabase: "https://opac.k10plus.de/"
+      picabase: "https://opac.k10plus.de/",
     },
     "test-k10plus-kxpt": {
       picabase: "https://kxpt.k10plus.de/DB=1.1/",
-      prefLabel: { de: "K10plus-Test (kxpt)" }
-    }
+      prefLabel: { de: "K10plus-Test (kxpt)" },
+    },
   },
   dbkey: "opac-de-627",
 
@@ -22,11 +22,11 @@ export default
   avram: "https://uri.gbv.de/avram-demo/", // TODO: change location!
 
   examples: [
-      "1673636357",
-      "168675535X", // only DDC and LCC
-      "786733772",
-  ]
-    /*
+    "1673636357",
+    "168675535X", // only DDC and LCC
+    "786733772",
+  ],
+  /*
     {
       uri:  "http://bartoc.org/en/node/430",
       namespace: "http://d-nb.info/gnd/",

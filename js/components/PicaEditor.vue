@@ -1,45 +1,68 @@
 <template>
-  <form v-on:submit.prevent="loadRecord">
-    <textarea ref="editor" v-model="text"></textarea>
+  <form @submit.prevent="loadRecord">
+    <textarea
+      ref="editor"
+      v-model="text" />
     <div v-if="unapi && dbkey">
-      <input type="text" v-model="ppn" placeholder="PPN" />
-      <button type="submit" :disabled="!ppn">laden</button>
-      <a v-if="ppn && picabase" 
-         v-bind:href="picabase+'PPNSET?PPN='+ppn" target="opac">&nbsp;🡕 im Katalog</a>
+      <input
+        v-model="ppn"
+        type="text"
+        placeholder="PPN">
+      <button
+        type="submit"
+        :disabled="!ppn">
+        laden
+      </button>
+      <a
+        v-if="ppn && picabase"
+        :href="picabase+'PPNSET?PPN='+ppn"
+        target="opac">&nbsp;🡕 im Katalog</a>
     </div>
   </form>
 </template>
 
 <script>
-import { serializePica, parsePica, PicaPath, getPPN, filterPicaFields } from '../pica.js'
-import CodeMirror from 'codemirror'
-import CodeMirrorMarc from '../codemirror-marc.js'
+import { serializePica, parsePica, getPPN, filterPicaFields } from "../pica.js"
+import CodeMirror from "codemirror"
 
 function getTextChildren(nodes) {
-    return nodes.map(node => typeof node.children === 'string' ? node.children : '').join('')
+  return nodes.map(node => typeof node.children === "string" ? node.children : "").join("")
 }
 
 // CodeMirror instance for PICA Plain records
 export default {
-  props: [
-      // unAPI base URL to load records from
-      "unapi", 
-      // database key to load records from via unAPI
-      "dbkey",
-      // list of PICA Path expressions to filter loaded records
-      "fields",
-      // base URL of catalog to link into
-      "picabase"
-  ],
+  props: {
+    // unAPI base URL to load records from
+    unapi: {
+      type: String,
+      default: null,
+    },
+    // database key to load records from via unAPI
+    dbkey: {
+      type: String,
+      default: null,
+    },
+    // list of PICA Path expressions to filter loaded records
+    fields: {
+      type: Array,
+      default: null,
+    },
+    // base URL of catalog to link into
+    picabase: {
+      type: String,
+      default: null,
+    },
+  },
+  emits: ["change"],
   data: function() {
     return {
-      text: '',
+      text: "",
       record: [],
       ppn: null,
     }
   },
   created() {
-    this.$watch('record', record => { 
+    this.$watch("record", record => {
       this.ppn = getPPN(record) || this.ppn
       this.$emit("change", { record, ppn: this.ppn })
     })
@@ -48,7 +71,7 @@ export default {
   },
   mounted: function() {
     this.editor = CodeMirror.fromTextArea(this.$refs.editor, {})
-    this.editor.on('change', editor => this.setText(editor.getValue()))
+    this.editor.on("change", editor => this.setText(editor.getValue()))
   },
   methods: {
     setText(text) {
@@ -64,15 +87,15 @@ export default {
       this.ppn = ppn
     },
     loadRecord() {
-      fetch(`${this.unapi}?format=picajson&id=${this.dbkey}:ppn:${this.ppn}`)        
-      .then(response => response.ok ? response.json() : null)
-      .then(record => {
-         if (record) {
-           this.setRecord(this.fields ? filterPicaFields(record, this.fields) : record)
-         }
-      })
-    }
-  }
+      fetch(`${this.unapi}?format=picajson&id=${this.dbkey}:ppn:${this.ppn}`)
+        .then(response => response.ok ? response.json() : null)
+        .then(record => {
+          if (record) {
+            this.setRecord(this.fields ? filterPicaFields(record, this.fields) : record)
+          }
+        })
+    },
+  },
 }
 </script>
 
