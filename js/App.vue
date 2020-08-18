@@ -20,7 +20,7 @@
           <th>Valide Notationen</th>
         </tr>
       </thead>
-      <tbody>          
+      <tbody>
         <tr v-for="scheme in schemes">
           <td><input type="checkbox" v-model="fromScheme" v-bind:value="scheme.uri"></td>
           <td><input type="checkbox" v-model="toScheme" v-bind:value="scheme.uri"></td>
@@ -41,7 +41,7 @@
     </p>
   </section>
   <section>
-   <table> 
+   <table>
      <thead>
        <tr><th>Datensatz</th></tr>
      </thead>
@@ -50,7 +50,7 @@
          <td>
            <ul class="inline">
              <li v-for="(db, key) in databases">
-               <input type="radio" v-bind:value="key" v-model="dbkey" style="margin-right:0.5em;"/>   
+               <input type="radio" v-bind:value="key" v-model="dbkey" style="margin-right:0.5em;"/>
                <concept-link :concept="db"/>
                <a v-bind:href="db.picabase" v-if="db.picabase">&nbsp;🡕 Katalog</a>
              </li>
@@ -59,7 +59,7 @@
        </tr>
        <tr>
          <td style="vertical-align: top;">
-           <PicaEditor :unapi="unapi" :dbkey="dbkey" 
+           <PicaEditor :unapi="unapi" :dbkey="dbkey"
                        :fields="fieldFilter" :picabase="databases[dbkey].picabase"
                         @change="recordChanged" ref="recordEditor"
            >{{recordText}}</PicaEditor>
@@ -84,7 +84,7 @@
          </td>
         </tr>
       </tbody>
-    </table>         
+    </table>
   </section>
   <section>
     <p>
@@ -94,7 +94,7 @@
         keine weitere Anreicherung ermittelt.
       </em>
     </p>
-    <table> 
+    <table>
      <thead v-if="!isEmpty(indexing)">
        <tr>
          <th>
@@ -133,7 +133,8 @@ import PicaEditor from './components/PicaEditor.vue'
 import MappingList from './components/MappingList.vue'
 import ConceptLink from './components/ConceptLink.vue'
 
-import { ConceptScheme } from './concept-scheme.js' 
+import jskos from "jskos-tools"
+const { ConceptScheme } = jskos
 import { PicaPath, serializePica } from './pica.js'
 import config from './config.js'
 import { enrichIndexing, indexingToPica } from './enrich-indexing.js'
@@ -198,7 +199,7 @@ export default {
       this.$refs.recordEditor.setPPN(ppn)
       this.$refs.recordEditor.loadRecord()
     },
-    recordChanged(ev) {   
+    recordChanged(ev) {
       this.ppn = ev.ppn
       this.record = ev.record || []
       this.updateIndexing()
@@ -213,7 +214,7 @@ export default {
               conceptSet = values.map(n => kos.conceptFromNotation(n, { inScheme: true })).filter(Boolean)
             indexing[kos.uri] = conceptSet
           }
-      }        
+      }
       this.indexing = indexing
     },
     getMappings() {
