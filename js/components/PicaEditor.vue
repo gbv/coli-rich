@@ -93,6 +93,13 @@ export default {
           if (record) {
             this.setRecord(this.fields ? filterPicaFields(record, this.fields) : record)
           }
+          // Push changed ppn and dbkey to router
+          this.$router.push({
+            query: {
+              ppn: this.ppn,
+              dbkey: this.dbkey,
+            },
+          })
         })
     },
   },

@@ -21,7 +21,8 @@
     "cocoda-sdk": "github:gbv/cocoda-sdk#71fca0d",
     "codemirror": "^5.56.0",
     "jskos-tools": "^1.0.10",
-    "vue": "^3.0.0-rc.5"
+    "vue": "^3.0.0-rc.5",
+    "vue-router": "^4.0.0-beta.6"
   },
   "devDependencies": {
     "eslint": "^7.7.0",

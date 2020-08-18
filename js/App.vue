@@ -58,7 +58,7 @@
       <em>Nicht aufgeführte Vokabulare, (Unter)Felder und invalide Notationen werden ignoriert!</em>
     </p>
   </section>
-  <section>
+  <section v-if="!isEmpty(schemes)">
     <table>
       <thead>
         <tr><th>Datensatz</th></tr>
@@ -121,7 +121,7 @@
       </tbody>
     </table>
   </section>
-  <section>
+  <section v-if="!isEmpty(schemes)">
     <p>
       <em>
         Momentan werden alle vorhandenen 1-zu-1 Mappings berücksichtigt!
@@ -198,6 +198,7 @@ export default {
       ...config,
       recordText: "003@ $0161165839X", // inital example record
       ppn: "",
+      loadSchemesPromise: null,
       schemes: {},
       fromScheme: [],
       toScheme: [],
@@ -208,31 +209,45 @@ export default {
       fieldFilter: ["...."],
     }
   },
+  watch: {
+    $route({ query }) {
+      const { ppn, dbkey } = query
+      if (!ppn || !dbkey) {
+        return
+      }
+      // Look whether any of these values is different from current values
+      if (ppn != this.ppn || dbkey != this.dbkey) {
+        // If yes, load the record
+        this.loadRecord(ppn)
+      }
+    },
+  },
   created() {
     this.$watch("indexing", () => this.getMappings())
     this.$watch("fromScheme", () => this.getMappings())
     this.$watch("toScheme", () => this.getMappings())
     this.$watch("schemes", () => this.updateIndexing())
-    this.loadSchemes()
+    this.loadSchemesPromise = this.loadSchemes()
   },
   methods: {
     isEmpty,
-    loadSchemes() {
+    async loadSchemes() {
       const schemes = {}
-      fetchJSON("schemes.json").then(array => {
-        (array||[]).filter(s => s.PICAPATH && s.notation).forEach(scheme => {
-          const { uri } = scheme
-          scheme.PICAPATH = new PicaPath(scheme.PICAPATH)
-          scheme.PICAFIELD = scheme.PICAPATH.tagString.replace(/\[(.+)\]/,"/$1")
-          schemes[uri] = new ConceptScheme(scheme)
-        })
-        this.fromScheme = Object.values(schemes).map(s => s.uri)
-        this.toScheme   = Object.values(schemes).map(s => s.uri)
-        this.fieldFilter = ["003@",...Object.values(schemes).map(s => s.PICAPATH)]
-        this.schemes = schemes
+      const array = await fetchJSON("schemes.json")
+      ;(array||[]).filter(s => s.PICAPATH && s.notation).forEach(scheme => {
+        const { uri } = scheme
+        scheme.PICAPATH = new PicaPath(scheme.PICAPATH)
+        scheme.PICAFIELD = scheme.PICAPATH.tagString.replace(/\[(.+)\]/,"/$1")
+        schemes[uri] = new ConceptScheme(scheme)
       })
+      this.fromScheme = Object.values(schemes).map(s => s.uri)
+      this.toScheme   = Object.values(schemes).map(s => s.uri)
+      this.fieldFilter = ["003@",...Object.values(schemes).map(s => s.PICAPATH)]
+      this.schemes = schemes
     },
-    loadRecord(ppn) {
+    async loadRecord(ppn) {
+      // Wait for schemes to be loaded
+      await this.loadSchemesPromise
       this.$refs.recordEditor.setPPN(ppn)
       this.$refs.recordEditor.loadRecord()
     },
