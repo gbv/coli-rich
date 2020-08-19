@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "lint": "eslint",
     "test": "mocha --recursive"
   },
   "pre-commit": [
