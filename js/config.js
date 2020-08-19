@@ -19,7 +19,7 @@ export default
 
   mappingApi: "https://coli-conc.gbv.de/api/mappings",
 
-  avram: "https://uri.gbv.de/avram-demo/", // TODO: change location!
+  avram: "https://format.k10plus.de/avram.pl",
 
   examples: [
     "161165839X",
