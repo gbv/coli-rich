@@ -26,6 +26,7 @@ export default
     "1673636357",
     "168675535X", // only DDC and LCC
     "786733772",
+    "1726524604", // contains enrichment
   ],
   /*
     {
