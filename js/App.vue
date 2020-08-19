@@ -196,7 +196,7 @@ export default {
   data() {
     return {
       ...config,
-      recordText: "003@ $0161165839X", // inital example record
+      recordText: "",
       ppn: "",
       loadSchemesPromise: null,
       schemes: {},

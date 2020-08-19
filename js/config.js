@@ -22,6 +22,7 @@ export default
   avram: "https://uri.gbv.de/avram-demo/", // TODO: change location!
 
   examples: [
+    "161165839X",
     "1673636357",
     "168675535X", // only DDC and LCC
     "786733772",
