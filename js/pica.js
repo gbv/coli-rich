@@ -1,3 +1,6 @@
+import jskos from "jskos-tools"
+const { ConceptScheme } = jskos
+
 export const picaFieldIdentifier = ([tag, occ]) =>
   tag + (occ ? "/" + (occ.length === 1 ? "0" + occ : occ) : "")
 
@@ -104,3 +107,13 @@ export const filterPicaFields = (pica, expr) => {
   expr = expr.map(e => e instanceof PicaPath ? e : new PicaPath(e))
   return pica.filter(field => expr.some(e => e.matchField(field)))
 }
+
+// Create a set of JSKOS concept schemes with PICAPATH
+export const picaSchemes = array =>
+  (array||[]).filter(s => s.PICAPATH).reduce((schemes, s) => {
+    s = new ConceptScheme(s)
+    s.PICAPATH = new PicaPath(s.PICAPATH)
+    s.PICAFIELD = s.PICAPATH.tagString.replace(/\[(.+)\]/,"/$1")
+    schemes[s.uri] = s
+    return schemes
+  }, {})

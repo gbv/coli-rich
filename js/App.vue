@@ -171,9 +171,7 @@ import PicaEditor from "./components/PicaEditor.vue"
 import MappingList from "./components/MappingList.vue"
 import ConceptLink from "./components/ConceptLink.vue"
 
-import jskos from "jskos-tools"
-const { ConceptScheme } = jskos
-import { PicaPath, serializePica } from "./pica.js"
+import { serializePica, picaSchemes } from "./pica.js"
 import config from "./config.js"
 import { enrichIndexing, indexingToPica } from "./enrich-indexing.js"
 
@@ -232,14 +230,7 @@ export default {
   methods: {
     isEmpty,
     async loadSchemes() {
-      const schemes = {}
-      const array = await fetchJSON("schemes.json")
-      ;(array||[]).filter(s => s.PICAPATH && s.notation).forEach(scheme => {
-        const { uri } = scheme
-        scheme.PICAPATH = new PicaPath(scheme.PICAPATH)
-        scheme.PICAFIELD = scheme.PICAPATH.tagString.replace(/\[(.+)\]/,"/$1")
-        schemes[uri] = new ConceptScheme(scheme)
-      })
+      const schemes = picaSchemes(await fetchJSON("schemes.json"))
       this.fromScheme = Object.values(schemes).map(s => s.uri)
       this.toScheme   = Object.values(schemes).map(s => s.uri)
       this.fieldFilter = ["003@",...Object.values(schemes).map(s => s.PICAPATH)]
