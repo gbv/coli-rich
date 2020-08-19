@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base /coli-rich",
+    "build": "vite build",
     "test": "mocha --recursive"
   },
   "pre-commit": [

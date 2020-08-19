@@ -5,8 +5,10 @@ let paths = [
   "**/*.js",
   "**/*.vue",
   "**/.*.js",
-  "!node_modules/**/*.js",
-  "!node_modules/**/.*.js",
+  "!node_modules/**/*",
+  "!node_modules/**/.*",
+  "!dist/**/*",
+  "!dist/**/.*",
 ]
 let options = {
   contextName: "ESLint",
