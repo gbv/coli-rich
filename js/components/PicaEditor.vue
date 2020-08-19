@@ -24,6 +24,7 @@
 <script>
 import { serializePica, parsePica, getPPN, filterPicaFields } from "../pica.js"
 import CodeMirror from "codemirror"
+import "./codemirror-marc.js"
 
 function getTextChildren(nodes) {
   return nodes.map(node => typeof node.children === "string" ? node.children : "").join("")
