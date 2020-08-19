@@ -44,9 +44,9 @@
           <td><a :href="cocoda+'?fromScheme='+scheme.uri">↦ </a></td>
           <td><a :href="cocoda+'?toScheme='+scheme.uri">⇥</a></td>
           <td>
-            <a
-              v-if="scheme.PICAFIELD"
-              :href="avram+'?field='+scheme.PICAFIELD">{{ scheme.PICAPATH.toString }}</a>
+            <pica-path
+              :path="scheme.PICAPATH" 
+              :api="avram" />
           </td>
           <td v-if="scheme.notationPattern">
             {{ scheme.notationPattern }}
@@ -168,6 +168,7 @@
 import PicaEditor from "./components/PicaEditor.vue"
 import MappingList from "./components/MappingList.vue"
 import ConceptLink from "./components/ConceptLink.vue"
+import PicaPath from "./components/PicaPath.vue"
 
 import { picaSchemes } from "./pica.js"
 import config from "./config.js"
@@ -183,15 +184,17 @@ function completeMapping(m) {
 }
 
 export default {
-  components: { PicaEditor, ConceptLink, MappingList },
+  components: { PicaEditor, PicaPath, ConceptLink, MappingList },
   provide() {
     return {
       cocoda: this.cocoda,
     }
   },
   data() {
+    const { avram } = config
     return {
       ...config,
+      avram,
       ppn: "",
       loadSchemesPromise: null,
       schemes: {},

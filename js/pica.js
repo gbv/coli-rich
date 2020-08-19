@@ -46,6 +46,10 @@ export class PicaPath {
     return this.tag.source.substring(1, this.tag.source.length-1)
   }
 
+  get fieldIdentifier() {
+    return this.tagString + (this.occ ? "/" + this.occurrenceString : "")
+  }
+
   get startOccurrence() {
     return Array.isArray(this.occ) ? this.occ[0] : null
   }
@@ -65,8 +69,7 @@ export class PicaPath {
   }
 
   get toString() {
-    return this.tagString
-            + (this.occ ? "/" + this.occurrenceString : "")
+    return this.fieldIdentifier
             + (this.sf ? "$" + this.subfieldString : "")
   }
 
@@ -113,7 +116,6 @@ export const picaSchemes = array =>
   (array||[]).filter(s => s.PICAPATH).reduce((schemes, s) => {
     s = new ConceptScheme(s)
     s.PICAPATH = new PicaPath(s.PICAPATH)
-    s.PICAFIELD = s.PICAPATH.tagString.replace(/\[(.+)\]/,"/$1")
     schemes[s.uri] = s
     return schemes
   }, {})
