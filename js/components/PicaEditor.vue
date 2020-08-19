@@ -67,8 +67,8 @@ export default {
       this.ppn = getPPN(record) || this.ppn
       this.$emit("change", { record, ppn: this.ppn })
     })
-    // FIXME: change in slot is not detected!
-    this.setText(getTextChildren(this.$slots.default()))
+    const slot = this.$slots.default
+    this.setText(slot ? getTextChildren(slot()) : "")
   },
   mounted: function() {
     this.editor = CodeMirror.fromTextArea(this.$refs.editor, {})

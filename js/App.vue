@@ -91,9 +91,7 @@
               :dbkey="dbkey"
               :fields="fieldFilter"
               :picabase="databases[dbkey].picabase"
-              @change="recordChanged">
-              {{ recordText }}
-            </PicaEditor>
+              @change="recordChanged" />
             <div
               v-if="examples && examples.length"
               style="font-size: smaller; padding-top: 0.2em;">
@@ -109,13 +107,13 @@
           </td>
         </tr>
       </tbody>
-      <thead v-if="enriched">
+      <thead>
         <tr><th>Ermittelte Anreicherung</th></tr>
       </thead>
-      <tbody v-if="enriched">
+      <tbody>
         <tr>
           <td>
-            <PicaEditor>{{ enriched }}</PicaEditor>
+            <PicaEditor ref="enrichmentEditor" />
           </td>
         </tr>
       </tbody>
@@ -171,7 +169,7 @@ import PicaEditor from "./components/PicaEditor.vue"
 import MappingList from "./components/MappingList.vue"
 import ConceptLink from "./components/ConceptLink.vue"
 
-import { serializePica, picaSchemes } from "./pica.js"
+import { picaSchemes } from "./pica.js"
 import config from "./config.js"
 import { enrichIndexing, indexingToPica } from "./enrich-indexing.js"
 
@@ -194,7 +192,6 @@ export default {
   data() {
     return {
       ...config,
-      recordText: "",
       ppn: "",
       loadSchemesPromise: null,
       schemes: {},
@@ -203,7 +200,6 @@ export default {
       indexing: {},
       mappings: [],
       record: [],
-      enriched: "",
       fieldFilter: ["...."],
     }
   },
@@ -283,6 +279,8 @@ export default {
         toScheme:   toScheme.join("|"),
       }
 
+      const { enrichmentEditor } = this.$refs
+
       return this.fetchMappings(query).then(mappings => {
         mappings.forEach(m => {
           const s = this.schemes[m.toScheme.uri]
@@ -294,8 +292,8 @@ export default {
         })
         var add = enrichIndexing(indexing)
         add = indexingToPica(add, this.schemes)
-        const pica = serializePica(add)
-        this.enriched = pica
+
+        enrichmentEditor.setRecord(add)
       })
     },
     fetchMappings(query) {
