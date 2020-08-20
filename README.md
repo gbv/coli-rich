@@ -31,7 +31,7 @@ Run some tests:
 npm test
 ~~~
 
-Build static files for deployment. The application is configured to be put in a subfolder `/coli-rich/`:
+Build static web interface files for deployment in subfolder `/dist/`:
 
 ~~~sh
 npm run build
