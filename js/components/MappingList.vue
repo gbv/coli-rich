@@ -50,7 +50,8 @@ export default {
   },
   methods: {
     mappingTypeSymbol(mapping) {
-      const type = mappingTypes.find(m => m.uri === mapping.type[0])
+      const uri = mapping.type ? mapping.type[0] : "http://www.w3.org/2004/02/skos/core#mappingRelation"
+      const type = mappingTypes.find(m => m.uri === uri)
       return type ? type.notation[0] : "?"
     },
   },
@@ -66,6 +67,7 @@ export default {
 }
 ul {
   list-style-type: none;
+  padding-left: 0em;
 }
 ul.mapping-list {
   padding-left: 1em;

@@ -172,15 +172,8 @@ import PicaPath from "./components/PicaPath.vue"
 
 import config from "./config.js"
 import { picaSchemes, indexingFromPica, indexingToPica } from "../lib/pica-jskos.js"
-import { enrichIndexing } from "./enrich-indexing.js"
+import { mappingsByFromConcept, indexingConcepts, enrichIndexing } from "./indexing.js"
 import { isEmpty, fetchJSON } from "./utils.js"
-
-function completeMapping(m) {
-  if (!m.type) m.type = ["http://www.w3.org/2004/02/skos/core#mappingRelation"]
-  if (!m.from) m.from = {}
-  if (!m.to) m.to = {}
-  ;(m.to.memberSet||[]).forEach(c => c.inScheme = [m.toScheme])
-}
 
 export default {
   components: { PicaEditor, PicaPath, ConceptLink, MappingList },
@@ -248,48 +241,47 @@ export default {
       this.indexing = indexingFromPica(this.record, this.schemes)
     },
     getMappings() {
-      const { toScheme, indexing } = this
+      const { toScheme, indexing, schemes } = this
 
-      const fromScheme = []
-      const from = {}
-      this.fromScheme.forEach(scheme => {
-        if (!isEmpty(indexing[scheme])) {
-          fromScheme.push(scheme)
-          indexing[scheme].forEach(c => from[c.uri] = c)
-        }
-      })
-      if (isEmpty(from)) return
+      const from = new Set()
+      const fromScheme = this.fromScheme.filter(uri => !isEmpty(indexing[uri]))
+      fromScheme.map(uri => (indexing[uri] || []).forEach(c => from.add(c.uri)))
 
-      Object.values(from).forEach(c => c.mappings = [])
+      // unset current mappings
+      for(let c of indexingConcepts(indexing)) {
+        c.mappings = []
+      }
+
+      if (!from.size) return
 
       // TODO: support querying by type and partOf
 
       const query = {
         fromScheme: fromScheme.join("|"),
-        from:       Object.keys(from).join("|"),
+        from:       Array.from(from).join("|"),
         toScheme:   toScheme.join("|"),
       }
 
-      const { enrichmentEditor } = this.$refs
-
-      return this.fetchMappings(query).then(mappings => {
-
-        mappings.forEach(m => {
-          const s = this.schemes[m.toScheme.uri]
-          if (s) m.toScheme.notation = s.notation
-
-          completeMapping(m);
-
-          (m.from.memberSet||[]).forEach(c => from[c.uri].mappings.push(m))
-        })
-        var add = enrichIndexing(indexing)
-        add = indexingToPica(add, this.schemes)
-
-        enrichmentEditor.setRecord(add)
-      })
-    },
-    fetchMappings(query) {
       return fetchJSON(`${this.mappingApi}?` + new URLSearchParams(query))
+        .then(mappings => {
+          const mappingsFrom = mappingsByFromConcept(mappings) 
+
+          // add information for display
+          Object.values(indexing).forEach(c => c.forEach(c => {
+            c.mappings = mappingsFrom[c.uri]
+            c.mappings.forEach(m => {
+              m.toScheme = schemes[m.toScheme.uri] || m.toScheme
+              m.to.memberSet.forEach(c => c.inScheme = [m.toScheme])
+            })
+          }))
+          
+          // calculate enrichment
+          return enrichIndexing(indexing, mappingsFrom)
+        })
+        .then( ({add}) => {
+          // show enrichment
+          this.$refs.enrichmentEditor.setRecord(indexingToPica(add, this.schemes))
+        })
     },
   },
 }
