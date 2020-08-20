@@ -1,5 +1,8 @@
-import jskos from "jskos-tools"
-const { ConceptScheme } = jskos
+/**
+ * PICA data processing module.
+ */
+
+// parsing and serializing PICA+ <-> PICA/JSON
 
 export const picaFieldIdentifier = ([tag, occ]) =>
   tag + (occ ? "/" + (occ.length === 1 ? "0" + occ : occ) : "")
@@ -7,27 +10,33 @@ export const picaFieldIdentifier = ([tag, occ]) =>
 export const serializePicaField = field =>
   picaFieldIdentifier(field)
     + " "
-    + field.slice(2).map((s,i) => i % 2 ? s.replace(/\$/g,"$") : "$" + s).join("")
+    + field.slice(2).map((s,i) => i % 2 ? s.replace(/\$/g,"$$$") : "$" + s).join("")
 
 export const serializePica = pica =>
   pica.map(serializePicaField).join("\n")
 
-// utility to write long regular expressions
-const regex = (...parts) => new RegExp(parts.map(r => r.source).join(""))
-const picaPlainLine = regex(
-  /^([012][0-9][0-9][A-Z@])/, // tag
-  /(\/([0-9]{2,3}))?/,        // occurrence
+const picaSubfieldPattern = /\$([A-Za-z0-9])((?:[^$]+|\$\$)+)/g
+const picaLinePattern = new RegExp([
+  /^(?<tag>[012][0-9][0-9][A-Z@])/,
+  /(\/(?<occurrence>[0-9]{2,3}))?/,
   /\s*/,
-  /(\$([A-Za-z0-9]).+)+/,
-)
+  /(?<subfields>(\$([A-Za-z0-9])([^$]|\$\$)+)+)$/,
+].map(r => r.source).join(""))
 
 export const parsePica = text => text.split(/\n/).map(line => {
-  const match = line.match(picaPlainLine)
+  const match = line.match(picaLinePattern)
   if (match) {
-    const sf = match[4].split(/\$([A-Za-z0-9])/).slice(1).map(s => s.replace(/\$\$/g,"$"))
-    return [ match[1], match[3], ...sf ]
+    const { tag, occurrence, subfields } = match.groups
+    const field = [ tag, occurrence ]
+    for (let m of subfields.matchAll(picaSubfieldPattern)) {
+      field.push(m[1], m[2].replace(/\$\$/g, "$"))
+    }
+    return field
   }
 }).filter(Boolean)
+
+
+// PICA path expression
 
 export class PicaPath {
   constructor(s) {
@@ -100,22 +109,13 @@ export class PicaPath {
   }
 }
 
+// filter record to fields listed in an array of PICA path expressions
+export const filterPicaFields = (pica, exprs) => {
+  exprs = Array.isArray(exprs) ? exprs : exprs.split(/\|/)
+  exprs = exprs.map(e => e instanceof PicaPath ? e : new PicaPath(e))
+  return pica.filter(field => exprs.some(e => e.matchField(field)))
+}
+
+// get PPN of a record
 const PPN = new PicaPath("003@$0")
-export function getPPN(record) {
-  return PPN.getValues(record)[0]
-}
-
-export const filterPicaFields = (pica, expr) => {
-  expr = Array.isArray(expr) ? expr : expr.split(/\|/)
-  expr = expr.map(e => e instanceof PicaPath ? e : new PicaPath(e))
-  return pica.filter(field => expr.some(e => e.matchField(field)))
-}
-
-// Create a set of JSKOS concept schemes with PICAPATH
-export const picaSchemes = array =>
-  (array||[]).filter(s => s.PICAPATH).reduce((schemes, s) => {
-    s = new ConceptScheme(s)
-    s.PICAPATH = new PicaPath(s.PICAPATH)
-    schemes[s.uri] = s
-    return schemes
-  }, {})
+export const getPPN = record => PPN.getValues(record)[0]

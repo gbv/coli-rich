@@ -170,7 +170,7 @@ import MappingList from "./components/MappingList.vue"
 import ConceptLink from "./components/ConceptLink.vue"
 import PicaPath from "./components/PicaPath.vue"
 
-import { picaSchemes } from "./pica.js"
+import { picaSchemes } from "./pica-jskos.js"
 import config from "./config.js"
 import { enrichIndexing, indexingToPica } from "./enrich-indexing.js"
 
@@ -212,9 +212,8 @@ export default {
       if (!ppn || !dbkey) {
         return
       }
-      // Look whether any of these values is different from current values
+      // Load record when ppn or dbkey has changed
       if (ppn != this.ppn || dbkey != this.dbkey) {
-        // If yes, load the record
         this.loadRecord(ppn)
       }
     },
