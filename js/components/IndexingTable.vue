@@ -38,8 +38,8 @@ import MappingTable from "./MappingTable.vue"
 export default {
   components: { ConceptLink, MappingTable },
   props: {
-    indexing: { type: Object },
-    schemes: { type: Object },
+    indexing: { type: Object, default: ()=>({}) },
+    schemes: { type: Object, default: ()=>({}) },
   },
 }
 </script>
