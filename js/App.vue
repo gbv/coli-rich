@@ -127,36 +127,9 @@
         keine weitere Anreicherung ermittelt.
       </em>
     </p>
-    <table>
-      <thead v-if="!isEmpty(indexing)">
-        <tr>
-          <th>
-            Ermittelte Erschließung und Mappings
-          </th>
-        </tr>
-      </thead>
-      <tbody v-if="!isEmpty(indexing)">
-        <tr>
-          <td>
-            <table>
-              <tbody
-                v-for="(set, uri) in indexing"
-                :key="uri">
-                <tr
-                  v-for="concept in set"
-                  :key="concept.uri">
-                  <td>{{ schemes[uri].notation[0] }}</td>
-                  <td><concept-link :concept="concept" /></td>
-                  <td v-if="(concept.mappings||[]).length">
-                    <mapping-list :mappings="concept.mappings" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <indexing-table
+      :indexing="indexing"
+      :schemes="schemes" />
   </section>
   <p>
     Mappings werden von <a :href="mappingApi">der Mappings-API</a>
@@ -166,8 +139,8 @@
 
 <script>
 import PicaEditor from "./components/PicaEditor.vue"
-import MappingList from "./components/MappingList.vue"
 import ConceptLink from "./components/ConceptLink.vue"
+import IndexingTable from "./components/IndexingTable.vue"
 import PicaPath from "./components/PicaPath.vue"
 
 import config from "./config.js"
@@ -176,7 +149,7 @@ import { mappingsByFromConcept, indexingConcepts, enrichIndexing } from "./index
 import { isEmpty, fetchJSON } from "./utils.js"
 
 export default {
-  components: { PicaEditor, PicaPath, ConceptLink, MappingList },
+  components: { PicaEditor, PicaPath, ConceptLink, IndexingTable },
   provide() {
     return {
       cocoda: this.cocoda,
@@ -243,6 +216,8 @@ export default {
     getMappings() {
       const { toScheme, indexing, schemes } = this
 
+      console.log("getMappings")
+
       const from = new Set()
       const fromScheme = this.fromScheme.filter(uri => !isEmpty(indexing[uri]))
       fromScheme.map(uri => (indexing[uri] || []).forEach(c => from.add(c.uri)))
@@ -252,7 +227,10 @@ export default {
         c.mappings = []
       }
 
-      if (!from.size) return
+      if (!from.size) {
+        this.$refs.enrichmentEditor.setRecord([])
+        return
+      }
 
       // TODO: support querying by type and partOf
 

@@ -5,7 +5,7 @@
       :key="m.uri">
       <tr>
         <td>
-          <a :href="m.uri">{{ mappingTypeSymbol(m) }}</a>
+          <a :href="cocoda ? cocoda + '?mappingUri=' + m.uri : m.uri">{{ mappingTypeSymbol(m) }}</a>
         </td>
         <td>
           <ul v-if="m.to && m.to.memberSet.length">
@@ -42,6 +42,7 @@ import ConceptLink from "./ConceptLink.vue"
 
 export default {
   components: { ConceptLink },
+  inject: ["cocoda"],
   props: {
     mappings: {
       type: Array,

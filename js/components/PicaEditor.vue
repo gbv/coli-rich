@@ -82,7 +82,9 @@ export default {
     setRecord(record) {
       this.record = record
       this.text = serializePica(record)
-      this.editor.setValue(this.text)
+      if (this.editor) { // editor may not be mounted yet
+        this.editor.setValue(this.text)
+      }
     },
     setPPN(ppn) {
       this.ppn = ppn
