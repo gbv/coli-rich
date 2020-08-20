@@ -1,5 +1,5 @@
 import assert from "assert"
-import { serializePica, parsePica, PicaPath, getPPN } from "../js/pica.js"
+import { serializePica, parsePica, PicaPath, getPPN } from "../lib/pica.js"
 
 const pathTests = {
   "003@": { tag: /^003@$/, occ: null, sf: null },

@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { PicaPath } from "../pica.js"
+import { PicaPath } from "../../lib/pica.js"
 import { fetchJSON } from "../utils.js"
 
 export default {

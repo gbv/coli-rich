@@ -1,5 +1,4 @@
 import { isEmpty } from "./utils.js"
-import { PicaPath } from "./pica.js"
 
 // use concept mappings from an IndexingSet to create additional IndexingSet
 export function enrichIndexing(indexing) {
@@ -34,42 +33,4 @@ export function enrichIndexing(indexing) {
   return addSet
 }
 
-// convert IndexingSet with known schemes to PICA record
-export function indexingToPica(indexing, schemes) {
-  const pica = []
-  const occCounter = {}
 
-  for (const schemeUri in indexing) {
-    const scheme = schemes[schemeUri]
-
-    if (!scheme || !scheme.PICAPATH) continue
-    const path = scheme.PICAPATH instanceof PicaPath
-      ? scheme.PICAPATH : new PicaPath(scheme.PICAPATH)
-
-    indexing[schemeUri].forEach(concept => {
-      const notation = concept.notation[0]
-
-      var id   = path.toString
-      var occ  = path.occurrenceString
-
-      if (path.startOccurrence) {
-        if (id in occCounter) {
-          occ = occCounter[id]
-        } else {
-          occ = path.startOccurrence
-        }
-        occCounter[id] = occ>8 ? (1*occ)+1 : "0"+((1*occ)+1)
-      }
-
-      const field = [path.tagString, occ]
-      field.push(path.subfieldString, notation)
-      if (concept.SOURCE) {
-        field.push("A", concept.SOURCE)
-      }
-
-      pica.push(field)
-    })
-  }
-
-  return pica
-}

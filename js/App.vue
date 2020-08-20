@@ -170,10 +170,9 @@ import MappingList from "./components/MappingList.vue"
 import ConceptLink from "./components/ConceptLink.vue"
 import PicaPath from "./components/PicaPath.vue"
 
-import { picaSchemes } from "./pica-jskos.js"
 import config from "./config.js"
-import { enrichIndexing, indexingToPica } from "./enrich-indexing.js"
-
+import { picaSchemes, indexingFromPica, indexingToPica } from "../lib/pica-jskos.js"
+import { enrichIndexing } from "./enrich-indexing.js"
 import { isEmpty, fetchJSON } from "./utils.js"
 
 function completeMapping(m) {
@@ -246,17 +245,7 @@ export default {
       this.updateIndexing()
     },
     updateIndexing() {
-      const indexing = {}
-      for (const kos of Object.values(this.schemes)) {
-        var conceptSet = []
-        const path = kos.PICAPATH
-        const values = path.getUniqueValues(this.record)
-        if (values.length) {
-          conceptSet = values.map(n => kos.conceptFromNotation(n, { inScheme: true })).filter(Boolean)
-          indexing[kos.uri] = conceptSet
-        }
-      }
-      this.indexing = indexing
+      this.indexing = indexingFromPica(this.record, this.schemes)
     },
     getMappings() {
       const { toScheme, indexing } = this
@@ -284,6 +273,7 @@ export default {
       const { enrichmentEditor } = this.$refs
 
       return this.fetchMappings(query).then(mappings => {
+
         mappings.forEach(m => {
           const s = this.schemes[m.toScheme.uri]
           if (s) m.toScheme.notation = s.notation
@@ -307,10 +297,4 @@ export default {
 
 <style>
 @import '../css/main.css';
-
-ul {
-  padding-left: 0;
-  list-style-type: none;
-  padding-bottom: 0.3em;
-}
 </style>

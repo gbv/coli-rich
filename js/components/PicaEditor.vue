@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { serializePica, parsePica, getPPN, filterPicaFields } from "../pica.js"
+import { serializePica, parsePica, getPPN, filterPicaFields } from "../../lib/pica.js"
 import CodeMirror from "codemirror"
 import "./codemirror-marc.js"
 
