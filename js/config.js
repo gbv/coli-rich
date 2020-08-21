@@ -11,6 +11,10 @@ export default
       picabase: "https://kxpt.k10plus.de/DB=1.1/",
       prefLabel: { de: "K10plus-Test (kxpt)" },
     },
+    k10plus: {
+      picabase: "https://kxp.k10plus.de/DB=1.1/",
+      prefLabel: { de: "K10plus Katalogisierung (1.1)" },
+    },
   },
   dbkey: "opac-de-627",
 
