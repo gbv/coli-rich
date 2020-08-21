@@ -45,7 +45,7 @@
           <td><a :href="cocoda+'?toScheme='+scheme.uri">⇥</a></td>
           <td>
             <pica-path
-              :path="scheme.PICAPATH" 
+              :path="scheme.PICAPATH"
               :api="avram" />
           </td>
           <td v-if="scheme.notationPattern">
@@ -179,6 +179,7 @@ export default {
       }
       // Load record when ppn or dbkey has changed
       if (ppn != this.ppn || dbkey != this.dbkey) {
+        this.dbkey = dbkey
         this.loadRecord(ppn)
       }
     },
@@ -242,7 +243,7 @@ export default {
 
       return fetchJSON(`${this.mappingApi}?` + new URLSearchParams(query))
         .then(mappings => {
-          const mappingsFrom = mappingsByFromConcept(mappings) 
+          const mappingsFrom = mappingsByFromConcept(mappings)
 
           // add information for display
           Object.values(indexing).forEach(c => c.forEach(c => {
@@ -252,7 +253,7 @@ export default {
               m.to.memberSet.forEach(c => c.inScheme = [m.toScheme])
             })
           }))
-          
+
           // calculate enrichment
           return enrichIndexing(indexing, mappingsFrom)
         })
