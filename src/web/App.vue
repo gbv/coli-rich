@@ -237,7 +237,7 @@ export default {
 
           // add information for display
           Object.values(indexing).forEach(c => c.forEach(c => {
-            c.mappings = mappingsFrom[c.uri]
+            c.mappings = mappingsFrom[c.uri] || []
             c.mappings.forEach(m => {
               m.toScheme = schemes[m.toScheme.uri] || m.toScheme
               m.to.memberSet.forEach(c => c.inScheme = [m.toScheme])
