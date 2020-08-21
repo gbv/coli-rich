@@ -110,7 +110,7 @@ export default {
 </script>
 
 <style>
-@import '../../css/codemirror.min.css';
+@import '../styles/codemirror.min.css';
 
 .CodeMirror {
   border: 1px solid #ddd;

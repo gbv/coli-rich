@@ -10,24 +10,10 @@
     <h1>coli-rich</h1>
     <p>Kataloganreicherung mittels Konkordanzen</p>
   </header>
-  <div id="app">
-  </div>
+  <div id="app"></div>
   <footer style="text-align:right;">
     <small><a href="https://github.com/gbv/coli-rich">sources</a></small>
   </footer>
+  <script type="module" src="/src/web/main.js"></script>
 </body>
-<script type="module">
-import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
-import App from './js/App.vue'
-const app = createApp(App)
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    { path: import.meta.env.BASE_URL, component: App },
-  ],
-})
-app.use(router)
-app.mount("#app")
-</script>
 </html>

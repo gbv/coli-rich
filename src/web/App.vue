@@ -265,7 +265,3 @@ export default {
   },
 }
 </script>
-
-<style>
-@import '../css/main.css';
-</style>

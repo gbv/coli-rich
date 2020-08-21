@@ -1,5 +1,5 @@
 import assert from "assert"
-import { serializePica, parsePica, PicaPath, getPPN } from "../lib/pica.js"
+import { serializePica, parsePica, PicaPath, getPPN } from "../src//lib/pica.js"
 
 const pathTests = {
   "003@": { tag: /^003@$/, occ: null, sf: null },
@@ -28,7 +28,7 @@ describe("getPPN", () => {
 })
 
 describe("PICA+ <-> PICA/JSON", () => {
-  for (let pp in parseTests) {    
+  for (let pp in parseTests) {
     const pica = parsePica(pp)
     assert.deepEqual(pica, parseTests[pp])
     assert.equal(serializePica(pica), pp)
