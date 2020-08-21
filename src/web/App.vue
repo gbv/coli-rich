@@ -1,11 +1,79 @@
 /* eslint-disable vue/valid-template-root */
 <template>
-  <section>
-    <p>
-      Aus im Rahmen von <a href="https://coli-conc.gbv.de/">coli-conc</a> gesammelten
-      Konkordanzen lässt sich die inhaltliche Erschließung von PICA-Datensätzen
-      anreichern. An dieser Stelle kann die automatische Anreicherung ausprobiert werden.
-    </p>
+  <p>
+    Aus im Rahmen von <a href="https://coli-conc.gbv.de/">coli-conc</a> gesammelten
+    Konkordanzen lässt sich die inhaltliche Erschließung von PICA-Datensätzen
+    anreichern. An dieser Stelle kann die automatische Anreicherung durch Mappings
+    ausprobiert werden. Mappings können mit <a :href="cocoda">Cocoda</a> erstellt
+    und bearbeitet werden.
+  </p>
+  <section v-if="!isEmpty(schemes)">
+    <table>
+      <thead>
+        <tr><th>Datensatz</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul class="inline">
+              <li
+                v-for="(db, key) in databases"
+                :key="key">
+                <input
+                  v-model="dbkey"
+                  type="radio"
+                  :value="key"
+                  style="margin-right:0.5em;">
+                <a :href="db.picabase">
+                  <concept-link :concept="db" />
+                </a>
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td
+            id="recordEditor"
+            style="vertical-align: top;">
+            <PicaEditor
+              ref="recordEditor"
+              :unapi="unapi"
+              :dbkey="dbkey"
+              :fields="fieldFilter"
+              :picabase="databases[dbkey].picabase"
+              @change="recordChanged" />
+            <div
+              v-if="examples && examples.length"
+              style="font-size: smaller; padding-top: 0.2em;">
+              Beispiele:
+              <ul class="inline">
+                <li
+                  v-for="ex in examples"
+                  :key="ex">
+                  <a @click="loadRecord(ex)">{{ ex }}</a>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <thead>
+        <tr><th>Ermittelte Anreicherung</th></tr>
+        <tr><td>Momentan werden nur 1-zu-1 Mappings zu Vokabularen mit denen noch nicht erschlossen wurde berücksichtigt.</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <PicaEditor ref="enrichmentEditor" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section v-if="!isEmpty(schemes)">
+    <indexing-table
+      :indexing="indexing"
+      :schemes="schemes" />
   </section>
   <section v-if="!isEmpty(schemes)">
     <table>
@@ -58,82 +126,6 @@
       <em>Nicht aufgeführte Vokabulare, (Unter)Felder und invalide Notationen werden ignoriert!</em>
     </p>
   </section>
-  <section v-if="!isEmpty(schemes)">
-    <table>
-      <thead>
-        <tr><th>Datensatz</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <ul class="inline">
-              <li
-                v-for="(db, key) in databases"
-                :key="key">
-                <input
-                  v-model="dbkey"
-                  type="radio"
-                  :value="key"
-                  style="margin-right:0.5em;">
-                <a :href="db.picabase">
-                  <concept-link :concept="db" />
-                </a>
-              </li>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td style="vertical-align: top;">
-            <PicaEditor
-              ref="recordEditor"
-              :unapi="unapi"
-              :dbkey="dbkey"
-              :fields="fieldFilter"
-              :picabase="databases[dbkey].picabase"
-              @change="recordChanged" />
-            <div
-              v-if="examples && examples.length"
-              style="font-size: smaller; padding-top: 0.2em;">
-              Beispiele:
-              <ul class="inline">
-                <li
-                  v-for="ex in examples"
-                  :key="ex">
-                  <a @click="loadRecord(ex)">{{ ex }}</a>
-                </li>
-              </ul>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-      <thead>
-        <tr><th>Ermittelte Anreicherung</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <PicaEditor ref="enrichmentEditor" />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-  <section v-if="!isEmpty(schemes)">
-    <p>
-      <em>
-        Momentan werden alle vorhandenen 1-zu-1 Mappings berücksichtigt!
-        Für Vokabulare mit denen schon Erschließung vorhanden ist, wird
-        keine weitere Anreicherung ermittelt.
-      </em>
-    </p>
-    <indexing-table
-      :indexing="indexing"
-      :schemes="schemes" />
-  </section>
-  <p>
-    Mappings werden von <a :href="mappingApi">der Mappings-API</a>
-    abgerufen.
-  </p>
 </template>
 
 <script>
@@ -263,3 +255,9 @@ export default {
   },
 }
 </script>
+
+<style>
+#recordEditor div.CodeMirror {
+  height: 20ex;
+}
+</style>
