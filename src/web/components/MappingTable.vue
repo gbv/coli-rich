@@ -38,12 +38,10 @@
 
 <script>
 import ConceptLink from "./ConceptLink.vue"
-import jskos from "jskos-tools"
-const { mappingTypes } = jskos
 
 export default {
   components: { ConceptLink },
-  inject: ["cocoda"],
+  inject: ["cocoda", "jskos"],
   props: {
     mappings: {
       type: Array,
@@ -53,7 +51,7 @@ export default {
   methods: {
     mappingTypeSymbol(mapping) {
       const uri = mapping.type ? mapping.type[0] : "http://www.w3.org/2004/02/skos/core#mappingRelation"
-      const type = mappingTypes.find(m => m.uri === uri)
+      const type = this.jskos.mappingTypes.find(m => m.uri === uri)
       return type ? type.notation[0] : "?"
     },
   },
