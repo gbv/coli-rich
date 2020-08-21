@@ -136,8 +136,8 @@ import PicaPath from "./components/PicaPath.vue"
 
 import config from "./config.js"
 import { picaSchemes, indexingFromPica, indexingToPica } from "../lib/pica-jskos.js"
-import { mappingsByFromConcept, indexingConcepts, enrichIndexing } from "./indexing.js"
-import { isEmpty, fetchJSON } from "./utils.js"
+import { mappingsByFromConcept, indexingConcepts, enrichIndexing } from "../lib/indexing.js"
+import { isEmpty, fetchJSON } from "../lib/utils.js"
 
 export default {
   components: { PicaEditor, PicaPath, ConceptLink, IndexingTable },

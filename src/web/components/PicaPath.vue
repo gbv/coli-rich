@@ -16,7 +16,7 @@
 
 <script>
 import { PicaPath } from "../../lib/pica.js"
-import { fetchJSON } from "../utils.js"
+import { fetchJSON } from "../../lib/utils.js"
 
 export default {
   props: {
