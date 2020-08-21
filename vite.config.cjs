@@ -1,6 +1,6 @@
 module.exports = {
-  plugins: ['JsonPlugin'],
   optimizeDeps: {
-    include: ['codemirror']
-  }
+    include: ["codemirror"],
+  },
+  esbuildTarget: "es2015",
 }
