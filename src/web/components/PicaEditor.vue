@@ -89,7 +89,11 @@ export default {
     setPPN(ppn) {
       this.ppn = ppn
     },
-    loadRecord() {
+    loadRecord() {        
+      if (!this.ppn || !this.dbkey) {
+        this.setRecord([])
+        return
+      }
       fetch(`${this.unapi}?format=picajson&id=${this.dbkey}:ppn:${this.ppn}`)
         .then(response => response.ok ? response.json() : null)
         .then(record => {
