@@ -37,8 +37,9 @@
 </template>
 
 <script>
-import mappingTypes from "../mapping-types.json"
 import ConceptLink from "./ConceptLink.vue"
+import jskos from "jskos-tools"
+const { mappingTypes } = jskos
 
 export default {
   components: { ConceptLink },
