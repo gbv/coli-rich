@@ -75,10 +75,9 @@
                   type="radio"
                   :value="key"
                   style="margin-right:0.5em;">
-                <concept-link :concept="db" />
-                <a
-                  v-if="db.picabase"
-                  :href="db.picabase">&nbsp;🡕 Katalog</a>
+                <a :href="db.picabase">
+                  <concept-link :concept="db" />
+                </a>
               </li>
             </ul>
           </td>
@@ -189,6 +188,7 @@ export default {
     this.$watch("fromScheme", () => this.getMappings())
     this.$watch("toScheme", () => this.getMappings())
     this.$watch("schemes", () => this.updateIndexing())
+    this.$watch("dbkey", () => this.loadRecord(this.ppn))
     this.loadSchemesPromise = this.loadSchemes()
   },
   methods: {
