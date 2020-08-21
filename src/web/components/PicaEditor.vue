@@ -63,12 +63,12 @@ export default {
     }
   },
   created() {
+    const slot = this.$slots.default
+    this.setText(slot ? getTextChildren(slot()) : "")
     this.$watch("record", record => {
       this.ppn = getPPN(record) || this.ppn
       this.$emit("change", { record, ppn: this.ppn })
     })
-    const slot = this.$slots.default
-    this.setText(slot ? getTextChildren(slot()) : "")
   },
   mounted: function() {
     this.editor = CodeMirror.fromTextArea(this.$refs.editor, {})
@@ -86,10 +86,10 @@ export default {
         this.editor.setValue(this.text)
       }
     },
-    setPPN(ppn) {
-      this.ppn = ppn
-    },
-    loadRecord() {        
+    loadRecord(ppn) {
+      if (ppn) {
+        this.ppn = ppn
+      }
       if (!this.ppn || !this.dbkey) {
         this.setRecord([])
         return

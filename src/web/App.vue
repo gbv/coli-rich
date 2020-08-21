@@ -23,7 +23,8 @@
                   v-model="dbkey"
                   type="radio"
                   :value="key"
-                  style="margin-right:0.5em;">
+                  style="margin-right:0.5em;"
+                  @change="loadRecord(null)">
                 <a :href="db.picabase">
                   <concept-link :concept="db" />
                 </a>
@@ -170,17 +171,14 @@ export default {
       }
       // Load record when ppn or dbkey has changed
       if (ppn != this.ppn || dbkey != this.dbkey) {
+        this.ppn = ppn
         this.dbkey = dbkey
-        this.loadRecord(ppn)
+        // Wait for schemes to be loaded, then load record
+        this.loadSchemesPromise.then(() => this.loadRecord(ppn))
       }
     },
   },
   created() {
-    this.$watch("indexing", () => this.getMappings())
-    this.$watch("fromScheme", () => this.getMappings())
-    this.$watch("toScheme", () => this.getMappings())
-    this.$watch("schemes", () => this.updateIndexing())
-    this.$watch("dbkey", () => this.loadRecord(this.ppn))
     this.loadSchemesPromise = this.loadSchemes()
   },
   methods: {
@@ -191,22 +189,21 @@ export default {
       this.toScheme   = Object.values(schemes).map(s => s.uri)
       this.fieldFilter = ["003@",...Object.values(schemes).map(s => s.PICAPATH)]
       this.schemes = schemes
+      // Set up watchers after schemes are loaded
+      // ? Can we move this to @change event of input elements? -> `fromScheme` is not current for that change 🤔
+      this.$watch("fromScheme", () => this.getMappings())
+      this.$watch("toScheme", () => this.getMappings())
     },
-    async loadRecord(ppn) {
-      // Wait for schemes to be loaded
-      await this.loadSchemesPromise
-      this.$refs.recordEditor.setPPN(ppn)
-      this.$refs.recordEditor.loadRecord()
+    loadRecord(ppn) {
+      this.$refs.recordEditor.loadRecord(ppn)
     },
     recordChanged(ev) {
       this.ppn = ev.ppn
       this.record = ev.record || []
-      this.updateIndexing()
-    },
-    updateIndexing() {
       this.indexing = indexingFromPica(this.record, this.schemes)
+      this.getMappings()
     },
-    getMappings() {
+    async getMappings() {
       const { toScheme, indexing, schemes } = this
 
       const from = new Set()
@@ -223,6 +220,7 @@ export default {
         return
       }
 
+      // TODO: use cocoda-sdk
       // TODO: support querying by type and partOf
 
       const query = {
@@ -231,26 +229,22 @@ export default {
         toScheme:   toScheme.join("|"),
       }
 
-      return fetchJSON(`${this.mappingApi}?` + new URLSearchParams(query))
-        .then(mappings => {
-          const mappingsFrom = mappingsByFromConcept(mappings)
+      const mappings = await fetchJSON(`${this.mappingApi}?` + new URLSearchParams(query))
+      const mappingsFrom = mappingsByFromConcept(mappings)
 
-          // add information for display
-          Object.values(indexing).forEach(c => c.forEach(c => {
-            c.mappings = mappingsFrom[c.uri] || []
-            c.mappings.forEach(m => {
-              m.toScheme = schemes[m.toScheme.uri] || m.toScheme
-              m.to.memberSet.forEach(c => c.inScheme = [m.toScheme])
-            })
-          }))
+      // add information for display
+      Object.values(indexing).forEach(c => c.forEach(c => {
+        c.mappings = mappingsFrom[c.uri] || []
+        c.mappings.forEach(m => {
+          m.toScheme = schemes[m.toScheme.uri] || m.toScheme
+          m.to.memberSet.forEach(c => c.inScheme = [m.toScheme])
+        })
+      }))
 
-          // calculate enrichment
-          return enrichIndexing(indexing, mappingsFrom)
-        })
-        .then( ({add}) => {
-          // show enrichment
-          this.$refs.enrichmentEditor.setRecord(indexingToPica(add, this.schemes))
-        })
+      // calculate enrichment
+      const { add } = enrichIndexing(indexing, mappingsFrom)
+      // show enrichment
+      this.$refs.enrichmentEditor.setRecord(indexingToPica(add, this.schemes))
     },
   },
 }
