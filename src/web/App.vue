@@ -217,8 +217,6 @@ export default {
     getMappings() {
       const { toScheme, indexing, schemes } = this
 
-      console.log("getMappings")
-
       const from = new Set()
       const fromScheme = this.fromScheme.filter(uri => !isEmpty(indexing[uri]))
       fromScheme.map(uri => (indexing[uri] || []).forEach(c => from.add(c.uri)))
