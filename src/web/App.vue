@@ -20,11 +20,11 @@
                 v-for="(db, key) in databases"
                 :key="key">
                 <input
-                  v-model="dbkey"
                   type="radio"
                   :value="key"
+                  :checked="dbkey == key"
                   style="margin-right:0.5em;"
-                  @change="loadRecord(null)">
+                  @input="dbkey = key; loadRecord(null)">
                 <a :href="db.picabase">
                   <concept-link :concept="db" />
                 </a>
@@ -195,7 +195,10 @@ export default {
       this.$watch("toScheme", () => this.getMappings())
     },
     loadRecord(ppn) {
-      this.$refs.recordEditor.loadRecord(ppn)
+      // Use $nextTick to give dbkey the chance to propagate to PicaEditor
+      this.$nextTick(() => {
+        this.$refs.recordEditor.loadRecord(ppn)
+      })
     },
     recordChanged(ev) {
       this.ppn = ev.ppn
