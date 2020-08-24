@@ -65,7 +65,9 @@
       <tbody>
         <tr>
           <td>
-            <PicaEditor ref="enrichmentEditor" />
+            <PicaEditor
+              ref="enrichmentEditor"
+              :editable="false" />
           </td>
         </tr>
       </tbody>

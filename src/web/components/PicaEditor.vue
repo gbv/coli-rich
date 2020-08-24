@@ -53,6 +53,11 @@ export default {
       type: String,
       default: null,
     },
+    // whether PICA record can be edited
+    editable: {
+      type: Boolean,
+      default: true,
+    },
   },
   emits: ["change"],
   data: function() {
@@ -71,7 +76,8 @@ export default {
     })
   },
   mounted: function() {
-    this.editor = CodeMirror.fromTextArea(this.$refs.editor, {})
+    const options = { readOnly: !this.editable }
+    this.editor = CodeMirror.fromTextArea(this.$refs.editor, options)
     this.editor.on("change", editor => this.setText(editor.getValue()))
   },
   methods: {
