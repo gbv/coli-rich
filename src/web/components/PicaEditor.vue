@@ -3,6 +3,15 @@
     <textarea
       ref="editor"
       v-model="text" />
+    <div class="helpline cm-s-default">
+      <code
+        v-if="field"
+        class="cm-variable-2">{{ field }}</code>
+      <span v-if="subfield">
+        <code class="cm-comment">$</code>
+        <code class="cm-keyword">{{ subfield }}</code>
+      </span>
+    </div>
     <div v-if="unapi && dbkey">
       <input
         v-model="ppn"
@@ -58,6 +67,11 @@ export default {
       type: Boolean,
       default: true,
     },
+    // Avram Schema
+    schema: {
+      type: Object,
+      default: null,
+    },
   },
   emits: ["change"],
   data: function() {
@@ -65,6 +79,8 @@ export default {
       text: "",
       record: [],
       ppn: null,
+      field: null,
+      subfield: null,
     }
   },
   created() {
@@ -79,8 +95,28 @@ export default {
     const options = { readOnly: !this.editable }
     this.editor = CodeMirror.fromTextArea(this.$refs.editor, options)
     this.editor.on("change", editor => this.setText(editor.getValue()))
+    this.editor.on("cursorActivity", () => {
+      const pica = this.picaAtCursor() || {}
+      this.field = pica.field
+      this.subfield = pica.subfield
+    })
   },
   methods: {
+    picaAtCursor() {
+      const { line, ch } = this.editor.getCursor()
+      const tokens = this.editor.getLineTokens(line)
+      //console.log(tokens)
+      if (tokens.length && tokens[0].type === "variable-2") {
+        var field = tokens[0].string
+        var subfield
+        for(const tok of tokens) {
+          if (tok.type === "keyword") subfield = tok.string
+          if (tok.end>ch) break
+        }
+        return { field, subfield }
+      }
+      return 
+    },
     setText(text) {
       this.text = text
       this.record = parsePica(text)
@@ -125,5 +161,10 @@ export default {
 .CodeMirror {
   border: 1px solid #ddd;
   height: auto;
+}
+
+.helpline {
+  padding: 3px;
+  height: 1.2em;
 }
 </style>
