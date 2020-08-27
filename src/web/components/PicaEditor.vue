@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="loadRecord">
+  <form @submit.prevent="loadRecord()">
     <textarea
       ref="editor"
       v-model="text" />
