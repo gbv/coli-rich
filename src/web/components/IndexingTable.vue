@@ -1,8 +1,8 @@
 <template>
-  <table>
+  <table class="table">
     <thead>
       <tr>
-        <th>
+        <th colspan="3">
           Ermittelte Erschließung und Mappings
         </th>
       </tr>

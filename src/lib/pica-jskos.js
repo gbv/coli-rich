@@ -5,7 +5,7 @@
 import jskos from "jskos-tools"
 const { ConceptScheme } = jskos
 
-import { PicaPath } from "./pica.js"
+import { PicaPath } from "pica-data"
 
 // Create a set of JSKOS concept schemes with PICAPATH
 export const picaSchemes = array =>

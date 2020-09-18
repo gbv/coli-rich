@@ -23,7 +23,7 @@ export default
 
   mappingApi: "https://coli-conc.gbv.de/api/mappings",
 
-  avram: "https://format.k10plus.de/avram.pl",
+  avramApi: "https://format.k10plus.de/avram.pl",
 
   examples: [
     "161165839X",

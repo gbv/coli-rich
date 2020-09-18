@@ -8,70 +8,55 @@
     und bearbeitet werden.
   </p>
   <section v-if="!isEmpty(schemes)">
-    <table>
-      <thead>
-        <tr><th>Datensatz</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <ul class="inline">
-              <li
-                v-for="(db, key) in databases"
-                :key="key">
-                <input
-                  type="radio"
-                  :value="key"
-                  :checked="dbkey == key"
-                  style="margin-right:0.5em;"
-                  @input="dbkey = key; loadRecord(null)">
-                <a :href="db.picabase">
-                  <concept-link :concept="db" />
-                </a>
-              </li>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td
-            id="recordEditor"
-            style="vertical-align: top;">
-            <PicaEditor
-              ref="recordEditor"
-              :unapi="unapi"
-              :dbkey="dbkey"
-              :fields="fieldFilter"
-              :picabase="databases[dbkey].picabase"
-              @change="recordChanged" />
-            <div
-              v-if="examples && examples.length"
-              style="font-size: smaller; padding-top: 0.2em;">
-              Beispiele:
-              <ul class="inline">
-                <li
-                  v-for="ex in examples"
-                  :key="ex">
-                  <a @click="loadRecord(ex)">{{ ex }}</a>
-                </li>
-              </ul>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-      <thead>
-        <tr><th>Ermittelte Anreicherung</th></tr>
-        <tr><td>Momentan werden nur 1-zu-1 Mappings zu Vokabularen mit denen noch nicht erschlossen wurde berücksichtigt.</td></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <PicaEditor
-              ref="enrichmentEditor"
-              :editable="false" />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <h3>Datensatz</h3>
+    <div>
+      <ul class="inline">
+        <li
+          v-for="(db, key) in databases"
+          :key="key">
+          <input
+            :id="'check-'+key"
+            type="radio"
+            :value="key"
+            :checked="dbkey == key"
+            style="margin-right:0.5em;"
+            @input="dbkey = key; loadRecord(null)">
+          <label :for="'check-'+key">
+            <concept-link :concept="db" />
+          </label>
+        </li>
+      </ul>
+    </div>
+    <div
+      id="recordEditor">
+      <PicaEditor
+        ref="recordEditor"
+        :unapi="unapi"
+        :dbkey="dbkey"
+        :filter="fieldFilter"
+        :picabase="databases[dbkey].picabase"
+        :avram="avram"
+        @update:ppn="updatePPN"
+        @update:record="updateRecord" />
+      <div
+        v-if="examples && examples.length"
+        style="font-size: smaller; padding-top: 0.2em;">
+        Beispiele:
+        <ul class="inline">
+          <li
+            v-for="ex in examples"
+            :key="ex">
+            <a @click="loadRecord(ex)">{{ ex }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <h3>Ermittelte Anreicherung</h3>
+    <p>Momentan werden nur 1-zu-1 Mappings zu Vokabularen mit denen noch nicht erschlossen wurde berücksichtigt.</p>
+    <PicaEditor
+      ref="enrichmentEditor"
+      :header="false"
+      :editable="false" />
   </section>
   <section v-if="!isEmpty(schemes)">
     <indexing-table
@@ -79,8 +64,11 @@
       :schemes="schemes" />
   </section>
   <section v-if="!isEmpty(schemes)">
-    <table>
-      <caption>Unterstützte Vokabulare</caption>
+    <h3>Unterstützte Vokabulare</h3>
+    <p>
+      <em>Nicht aufgeführte Vokabulare, (Unter)Felder und invalide Notationen werden ignoriert!</em>
+    </p>
+    <table class="table">
       <thead>
         <tr>
           <th>↦ </th>
@@ -117,7 +105,7 @@
           <td>
             <pica-path
               :path="scheme.PICAPATH"
-              :api="avram" />
+              :api="avramApi" />
           </td>
           <td v-if="scheme.notationPattern">
             {{ scheme.notationPattern }}
@@ -125,14 +113,11 @@
         </tr>
       </tbody>
     </table>
-    <p>
-      <em>Nicht aufgeführte Vokabulare, (Unter)Felder und invalide Notationen werden ignoriert!</em>
-    </p>
   </section>
 </template>
 
 <script>
-import PicaEditor from "./components/PicaEditor.vue"
+import PicaEditor from "pica-editor"
 import ConceptLink from "./components/ConceptLink.vue"
 import IndexingTable from "./components/IndexingTable.vue"
 import PicaPath from "./components/PicaPath.vue"
@@ -141,6 +126,7 @@ import config from "./config.js"
 import { picaSchemes, indexingFromPica, indexingToPica } from "../lib/pica-jskos.js"
 import { mappingsByFromConcept, indexingConcepts, enrichIndexing } from "../lib/indexing.js"
 import { isEmpty, fetchJSON } from "../lib/utils.js"
+import { filterPicaFields, PicaPath as PPath } from "pica-data"
 
 export default {
   components: { PicaEditor, PicaPath, ConceptLink, IndexingTable },
@@ -150,10 +136,11 @@ export default {
     }
   },
   data() {
-    const { avram } = config
+    const { avramApi } = config
     return {
       ...config,
-      avram,
+      avramApi,
+      avram: undefined,
       ppn: "",
       loadSchemesPromise: null,
       schemes: {},
@@ -161,8 +148,6 @@ export default {
       toScheme: [],
       indexing: {},
       mappings: [],
-      record: [],
-      fieldFilter: ["...."],
     }
   },
   watch: {
@@ -182,14 +167,20 @@ export default {
   },
   created() {
     this.loadSchemesPromise = this.loadSchemes()
-  },
+  },    
   methods: {
     isEmpty,
     async loadSchemes() {
       const schemes = picaSchemes(await fetchJSON("schemes.json"))
       this.fromScheme = Object.values(schemes).map(s => s.uri)
       this.toScheme   = Object.values(schemes).map(s => s.uri)
-      this.fieldFilter = ["003@",...Object.values(schemes).map(s => s.PICAPATH)]
+
+      // TODO: in pica-data-js make "PicaPath.toString" a function
+      this.indexingFields = [new PPath("003@"),...Object.values(schemes).map(s => s.PICAPATH)]
+
+      const url = this.avramApi + "?profile=k10plus&fields=" + this.indexingFields.map(s=>s.toString).join("|")
+      this.avram = await fetchJSON(url)
+
       this.schemes = schemes
       // Set up watchers after schemes are loaded
       // ? Can we move this to @change event of input elements? -> `fromScheme` is not current for that change 🤔
@@ -202,11 +193,14 @@ export default {
         this.$refs.recordEditor.loadRecord(ppn)
       })
     },
-    recordChanged(ev) {
-      this.ppn = ev.ppn
-      this.record = ev.record || []
-      this.indexing = indexingFromPica(this.record, this.schemes)
-      this.getMappings()
+    updatePPN(ppn) { this.ppn = ppn },
+    updateRecord(record) {
+      this.indexing = indexingFromPica(record || [], this.schemes)
+      console.log(this.indexing)
+      this.getMappings()        
+    },
+    fieldFilter(record) {
+      return filterPicaFields(record, this.indexingFields)
     },
     async getMappings() {
       const { toScheme, indexing, schemes } = this
@@ -257,6 +251,6 @@ export default {
 
 <style>
 #recordEditor div.CodeMirror {
-  height: 20ex;
+  width: 100%;
 }
 </style>

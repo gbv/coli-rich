@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite --config vite.config.cjs",
     "build": "vite --config vite.config.cjs build",
-    "lint": "eslint",
+    "lint": "eslint --fix './{src,test}/**/*.{js,vue}'",
     "test": "mocha --recursive"
   },
   "pre-commit": [
@@ -20,16 +20,17 @@
   },
   "dependencies": {
     "cocoda-sdk": "github:gbv/cocoda-sdk#71fca0d",
-    "codemirror": "^5.56.0",
-    "jskos-tools": "^1.0.10",
-    "vue": "^3.0.0-rc.5",
-    "vue-router": "^4.0.0-beta.6"
+    "codemirror": "^5.57.0",
+    "jskos-tools": "^1.0.14",
+    "pica-editor": "^0.4.4",
+    "vue": "^3.0.0-rc.12",
+    "vue-router": "^4.0.0-beta.9"
   },
   "devDependencies": {
-    "eslint": "^7.7.0",
+    "eslint": "^7.9.0",
     "eslint-config-gbv": "git+https://github.com/gbv/eslint-config-gbv.git",
-    "eslint-plugin-vue": "^7.0.0-beta.2",
-    "mocha": "^8.1.1",
+    "eslint-plugin-vue": "^7.0.0-beta.3",
+    "mocha": "^8.1.3",
     "mocha-eslint": "^6.0.0",
     "pre-commit": "^1.2.2",
     "vite": "^1.0.0-rc.4"

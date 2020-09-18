@@ -14,24 +14,18 @@ header p {
 h2 {
   font-size: large;
 }
-table {
+.table {
   border-collapse: collapse;
 }
-thead, tfoot {
-  background: #ddd; 
-}
-tbody {
+.table thead, tfoot {
   background: #eee; 
 }
-th {
+.table th {
   text-align: left;
 }
-td, th {
+.table > tbody > tr > td, th {
   padding: 0.2em 0.5em;
   border: 1px solid #ddd;
-}
-caption {
-  font-weight: bold;
 }
 a {
   text-decoration: none;   
