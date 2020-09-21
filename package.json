@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite --config vite.config.cjs",
     "build": "vite --config vite.config.cjs build",
-    "lint": "eslint --fix './{src,test}/**/*.{js,vue}'",
+    "lint": "eslint --fix './{src,test}/**/*.{js,vue}' '*.js'",
     "test": "mocha --recursive"
   },
   "pre-commit": [
@@ -19,8 +19,10 @@
     "node": ">=14"
   },
   "dependencies": {
+    "axios": "^0.20.0",
     "cocoda-sdk": "github:gbv/cocoda-sdk#71fca0d",
     "codemirror": "^5.57.0",
+    "express": "^4.17.1",
     "jskos-tools": "^1.0.14",
     "pica-editor": "^0.4.6",
     "vue": "^3.0.0",

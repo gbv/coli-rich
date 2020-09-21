@@ -25,6 +25,8 @@ export default
 
   avramApi: "https://format.k10plus.de/avram.pl",
 
+  port: "3077",
+
   examples: [
     "161165839X",
     "1673636357",

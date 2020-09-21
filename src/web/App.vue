@@ -122,7 +122,7 @@ import ConceptLink from "./components/ConceptLink.vue"
 import IndexingTable from "./components/IndexingTable.vue"
 import PicaPath from "./components/PicaPath.vue"
 
-import config from "./config.js"
+import config from "../config.js"
 import { indexingToPica } from "../lib/pica-jskos.js"
 import { isEmpty, fetchJSON } from "../lib/utils.js"
 
@@ -137,7 +137,7 @@ export default {
     }
   },
   data() {
-    const enricher = new Enricher(config) 
+    const enricher = new Enricher({ ...config, fetchJSON }) 
     return {        
       ...config,
       enricher,
