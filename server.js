@@ -8,64 +8,88 @@ import config from "./src/config.js"
 // Add default headers
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*")
-  res.setHeader("Content-Type", "application/json; charset=utf-8")
   next()
 })
+
+import { errorHandler, RequestError, NotFoundError } from "./src/api/errors.js"
 
 import axios from "axios"
 import { isEmpty } from "./src/lib/utils.js"
 import Enricher from "./src/lib/enricher.js"
 import { readFileSync } from "fs"
-import { indexingConcepts } from "./src/lib/indexing.js"
 import { indexingToPica } from "./src/lib/pica-jskos.js"
+import { serializePica, serializePicaField } from "pica-data"
 
 const fetchJSON = async url => axios.get(url).then(res => res.data)
-
 const schemes = JSON.parse(readFileSync("./public/schemes.json"))
 const enricher = new Enricher({...config, fetchJSON })
 
+function sendText(res, text) {
+  res.setHeader("Content-Type", "text/plain")
+  res.send(text)
+}
+
 app.get("/", async (req, res, next) => {
-  var { dbkey, ppn, format, fromScheme, toScheme } = req.query
+  var { id, format, fromScheme, toScheme } = req.query
+
+  if (!id) {
+    return next(new RequestError("Missing query parameter: id"))
+  } else if (!id.match(/^[^:]+:ppn:[0-9X]+$/)) {
+    return next(new RequestError("Malformed query parameter: id"))
+  }
+    
+  // eslint-disable-next-line no-unused-vars
+  const [dbkey, ppn] = id.split(":ppn:")
 
   // defaults
-  fromScheme = fromScheme ? fromScheme.split("|") : Object.values(schemes).map(s => s.uri)
-  toScheme = toScheme ? toScheme.split("|") : Object.values(schemes).map(s => s.uri)
-  dbkey = dbkey || config.dbkey
+  fromScheme = fromScheme ? fromScheme.split("|") : Object.values(enricher.schemes).map(s => s.uri)
+  toScheme = toScheme ? toScheme.split("|") : Object.values(enricher.schemes).map(s => s.uri)
 
-  try {
-    if (!ppn) throw new Error("Missing parameter: ppn") 
+  const url = `${config.unapi}?id=${id}&format=picajson`
+  const record = await fetchJSON(url).catch(() =>  
+    next(new NotFoundError("Record not found: "+id)))
+  if (!record) return
 
-    const id = `${dbkey}:ppn:${ppn}`
-    const url = `${config.unapi}?id=${id}&format=picajson`
-    const record = await fetchJSON(url)
-      .catch(() => { throw new Error("Record not found: "+id) } )
-    const indexing = enricher.extractIndexing(record)
+  const indexing = enricher.extractIndexing(record)
 
-    // TODO: move to Enricher
-    var from = new Set()
-    fromScheme = fromScheme.filter(uri => !isEmpty(indexing[uri]))
-    fromScheme.map(uri => (indexing[uri] || []).forEach(c => from.add(c.uri)))
-    for(let c of indexingConcepts(indexing)) {
-      c.mappings = []
-    }
-    from = Array.from(from)
+  // TODO: move to Enricher, this lines duplicated in App.vue
+  var from = new Set()
+  fromScheme = fromScheme.filter(uri => !isEmpty(indexing[uri]))
+  fromScheme.map(uri => (indexing[uri] || []).forEach(c => from.add(c.uri)))
+  from = Array.from(from)
 
-    const result = await enricher.enrich(indexing, { fromScheme, toScheme, from })
-    if (format === "pica") {
-      res.json(indexingToPica(result, enricher.schemes)) // FIXME
+  if (format === "indexing") {
+    res.json(indexing)
+  } else if (format === "picajson") { 
+    res.send(indexingToPica(indexing, enricher.schemes))
+  } else if (format === "pp") {
+    pica = serializePica(indexingToPica(indexing, enricher.schemes))
+    sendText(res, "003@ $0" + ppn + "\n" + pica)
+  } else {
+    const diff = await enricher.enrich(indexing, { fromScheme, toScheme, from })
+    if (format === "diff") {
+      res.json(diff)
     } else {
-      res.json(result)
+      // TODO: move to pica-data library
+      var pica = ["  003@ $0" + ppn]
+      if (diff.add) {
+        pica.push(
+          ...indexingToPica(diff.add, enricher.schemes).map(field => "+ " + serializePicaField(field)),
+        )
+      }
+      // TODO: fields to remove
+
+      sendText(res, pica.join("\n"))
     }
- 
-  } catch(error) {
-    return next(error) // TODO: add error handler
   }
 })
 
 // TODO: respect query parameters?
 app.get("/voc", (req, res) => {
-  res.json(schemes)
+  res.json(Object.values(schemes))
 })
+
+app.use(errorHandler)
 
 enricher.setSchemes(schemes).then(() => {
   console.log("Initialized with "+Object.keys(enricher.schemes).length+" concept schemes (see /voc)")
