@@ -7,7 +7,7 @@
     ausprobiert werden. Mappings können mit <a :href="cocoda">Cocoda</a> erstellt
     und bearbeitet werden.
   </p>
-  <section v-if="!isEmpty(schemes)">
+  <section v-if="!isEmpty(enricher.schemes)">
     <h3>Datensatz</h3>
     <div>
       <ul class="inline">
@@ -33,9 +33,9 @@
         ref="recordEditor"
         :unapi="unapi"
         :dbkey="dbkey"
-        :filter="fieldFilter"
+        :filter="true"
         :picabase="databases[dbkey].picabase"
-        :avram="avram"
+        :avram="enricher.avram"
         @update:ppn="updatePPN"
         @update:record="updateRecord" />
       <div
@@ -58,12 +58,12 @@
       :header="false"
       :editable="false" />
   </section>
-  <section v-if="!isEmpty(schemes)">
+  <section v-if="!isEmpty(enricher.schemes)">
     <indexing-table
       :indexing="indexing"
-      :schemes="schemes" />
+      :schemes="enricher.schemes" />
   </section>
-  <section v-if="!isEmpty(schemes)">
+  <section v-if="!isEmpty(enricher.schemes)">
     <h3>Unterstützte Vokabulare</h3>
     <p>
       <em>Nicht aufgeführte Vokabulare, (Unter)Felder und invalide Notationen werden ignoriert!</em>
@@ -84,7 +84,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="scheme in schemes"
+          v-for="scheme in enricher.schemes"
           :key="scheme.uri">
           <td>
             <input
@@ -103,9 +103,9 @@
           <td><a :href="cocoda+'?fromScheme='+scheme.uri">↦ </a></td>
           <td><a :href="cocoda+'?toScheme='+scheme.uri">⇥</a></td>
           <td>
-            <pica-path
+            <PicaPath
               :path="scheme.PICAPATH"
-              :api="avramApi" />
+              :avram="enricher.avram" />
           </td>
           <td v-if="scheme.notationPattern">
             {{ scheme.notationPattern }}
@@ -123,10 +123,11 @@ import IndexingTable from "./components/IndexingTable.vue"
 import PicaPath from "./components/PicaPath.vue"
 
 import config from "./config.js"
-import { picaSchemes, indexingFromPica, indexingToPica } from "../lib/pica-jskos.js"
-import { mappingsByFromConcept, indexingConcepts, enrichIndexing } from "../lib/indexing.js"
+import { indexingToPica } from "../lib/pica-jskos.js"
 import { isEmpty, fetchJSON } from "../lib/utils.js"
-import { filterPicaFields, PicaPath as PPath } from "pica-data"
+
+import Enricher from "../lib/enricher.js"
+import { indexingConcepts } from "../lib/indexing.js"
 
 export default {
   components: { PicaEditor, PicaPath, ConceptLink, IndexingTable },
@@ -136,14 +137,13 @@ export default {
     }
   },
   data() {
-    const { avramApi } = config
-    return {
+    const enricher = new Enricher(config) 
+    return {        
       ...config,
-      avramApi,
-      avram: undefined,
+      enricher,
+      avram: null,
       ppn: "",
       loadSchemesPromise: null,
-      schemes: {},
       fromScheme: [],
       toScheme: [],
       indexing: {},
@@ -171,17 +171,15 @@ export default {
   methods: {
     isEmpty,
     async loadSchemes() {
-      const schemes = picaSchemes(await fetchJSON("schemes.json"))
+      const { enricher } = this
+
+      const schemes = await fetchJSON("schemes.json")
       this.fromScheme = Object.values(schemes).map(s => s.uri)
       this.toScheme   = Object.values(schemes).map(s => s.uri)
+    
+      await enricher.setSchemes(schemes)
+      this.avram = enricher.avram
 
-      // TODO: in pica-data-js make "PicaPath.toString" a function
-      this.indexingFields = [new PPath("003@"),...Object.values(schemes).map(s => s.PICAPATH)]
-
-      const url = this.avramApi + "?profile=k10plus&fields=" + this.indexingFields.map(s=>s.toString).join("|")
-      this.avram = await fetchJSON(url)
-
-      this.schemes = schemes
       // Set up watchers after schemes are loaded
       // ? Can we move this to @change event of input elements? -> `fromScheme` is not current for that change 🤔
       this.$watch("fromScheme", () => this.getMappings())
@@ -195,15 +193,12 @@ export default {
     },
     updatePPN(ppn) { this.ppn = ppn },
     updateRecord(record) {
-      this.indexing = indexingFromPica(record || [], this.schemes)
-      console.log(this.indexing)
+      this.indexing = this.enricher.extractIndexing(record || [])
       this.getMappings()        
     },
-    fieldFilter(record) {
-      return filterPicaFields(record, this.indexingFields)
-    },
     async getMappings() {
-      const { toScheme, indexing, schemes } = this
+      const { toScheme, indexing } = this
+      const schemes = this.enricher.schemes
 
       const from = new Set()
       const fromScheme = this.fromScheme.filter(uri => !isEmpty(indexing[uri]))
@@ -219,31 +214,14 @@ export default {
         return
       }
 
-      // TODO: use cocoda-sdk
       // TODO: support querying by type and partOf
+      const query = { fromScheme, from: Array.from(from), toScheme }
 
-      const query = {
-        fromScheme: fromScheme.join("|"),
-        from:       Array.from(from).join("|"),
-        toScheme:   toScheme.join("|"),
-      }
+      // calculate enrichment (also modifies "indexing")
+      const { add } = await this.enricher.enrich(indexing, query)
 
-      const mappings = await fetchJSON(`${this.mappingApi}?` + new URLSearchParams(query))
-      const mappingsFrom = mappingsByFromConcept(mappings)
-
-      // add information for display
-      Object.values(indexing).forEach(c => c.forEach(c => {
-        c.mappings = mappingsFrom[c.uri] || []
-        c.mappings.forEach(m => {
-          m.toScheme = schemes[m.toScheme.uri] || m.toScheme
-          m.to.memberSet.forEach(c => c.inScheme = [m.toScheme])
-        })
-      }))
-
-      // calculate enrichment
-      const { add } = enrichIndexing(indexing, mappingsFrom)
       // show enrichment
-      this.$refs.enrichmentEditor.setRecord(indexingToPica(add, this.schemes))
+      this.$refs.enrichmentEditor.setRecord(indexingToPica(add, schemes))
     },
   },
 }

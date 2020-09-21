@@ -45,20 +45,20 @@ export const indexingToPica = (indexing, schemes) => {
     indexing[schemeUri].forEach(concept => {
       const notation = concept.notation[0]
 
-      var id   = path.toString
-      var occ  = path.occurrenceString
+      var id   = path.toString()
+      var occ  = path.occurrenceString()
 
-      if (path.startOccurrence) {
+      if (path.startOccurrence()) {
         if (id in occCounter) {
           occ = occCounter[id]
         } else {
-          occ = path.startOccurrence
+          occ = path.startOccurrence()
         }
         occCounter[id] = occ>8 ? (1*occ)+1 : "0"+((1*occ)+1)
       }
 
-      const field = [path.tagString, occ]
-      field.push(path.subfieldString, notation)
+      const field = [path.tagString(), occ]
+      field.push(path.subfieldString(), notation)
       if (concept.SOURCE) {
         field.push("A", concept.SOURCE)
       }

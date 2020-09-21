@@ -1,22 +1,18 @@
 <template>
   <span v-if="path">
-    <span v-if="definition && definition.pica3">{{ definition.pica3 }}=</span>
+    <span v-if="schedule && schedule.pica3">{{ schedule.pica3 }}=</span>
     <a
-      v-if="definition"
-      :href="definition.url"
-      :title="definition.label">
-      {{ path.toString }}
+      v-if="schedule"
+      :href="schedule.url"
+      :title="schedule.label">
+      {{ pathString }}
     </a>
-    <a
-      v-else-if="api"
-      :href="api+'?field='+path.fieldIdentifier">{{ path.toString }}</a>
-    <span v-else>{{ path.toString }}</span>
+    <span v-else>{{ pathString }}</span>
   </span>
 </template>
 
 <script>
-import { PicaPath } from "pica-data"
-import { fetchJSON } from "../../lib/utils.js"
+import { PicaPath, picaFieldSchedule } from "pica-data"
 
 export default {
   props: {
@@ -24,20 +20,23 @@ export default {
       type: PicaPath,
       default: null,
     },
-    api: {
-      type: String,
+    avram: {
+      type: Object,
       default: null,
     },
   },
-  data() {
-    return { definition: null }
-  },
-  created() {
-    if (this.api && this.path) {
-      const id = this.path.fieldIdentifier
-      fetchJSON(this.api + "?field=" + id).then(avram => {
-        this.definition = (avram.fields || {})[id] })
-    }
+  computed: {
+    pathString() {
+      return this.path ? this.path.toString() : ""
+    },
+    schedule() {
+      const { path } = this
+      if (path) {
+        return picaFieldSchedule(this.avram, [path.tagString(), path.startOccurrence()])
+      } else {
+        return null
+      }
+    },
   },
 }
 </script>

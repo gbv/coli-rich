@@ -9,6 +9,6 @@ describe("picaSchemes", () => {
     const schemes = picaSchemes([{ uri: "http://example.org", PICAPATH: "000X$x" }])
     assert.deepEqual(Object.keys(schemes),["http://example.org"])
     assert(schemes["http://example.org"] instanceof ConceptScheme)
-   assert(schemes["http://example.org"].PICAPATH instanceof PicaPath)
+    assert(schemes["http://example.org"].PICAPATH instanceof PicaPath)
   })
 })
