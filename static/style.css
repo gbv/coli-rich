@@ -1,0 +1,28 @@
+body {
+  font-family: sans-serif;
+}
+h1 {
+  font-size: 1.8em;
+}
+h2 {
+  font-size: 1.4em;
+}
+h3 {
+  font-size: 1.2em;
+}
+a {
+  text-decoration: none;
+}
+footer {
+  border-top: 1px solid #ddd;
+}
+footer ul {
+  padding: 0 1em;
+}
+footer li {
+  display: inline;
+  list-style-type: none;
+}
+footer li + li::before {
+    content: "\A0\A0|\A0\A0";
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "PICAPATH": "045Q[01-09]$a",
+    "identifier": [
+      "http://id.loc.gov/vocabulary/classSchemes/bkl",
+      "http://uri.gbv.de/terminology/bk/"
+    ],
+    "namespace": "http://uri.gbv.de/terminology/bk/",
+    "notation": [
+      "BK"
+    ],
+    "notationPattern": "(0|1-2|3-4|5|7-8|[0-9]{2}(\\.[0-9]{2})?)",
+    "prefLabel": {
+      "de": "Basisklassifikation",
+      "en": "Basic Classification",
+      "nl": "Nederlandse basisclassificatie"
+    },
+    "uri": "http://bartoc.org/en/node/18785",
+    "uriPattern": null
+  },
+  {
+    "PICAPATH": "045G$a",
+    "identifier": [
+      "http://www.wikidata.org/entity/Q67011877",
+      "http://uri.gbv.de/terminology/ddcdnb"
+    ],
+    "namespace": "http://uri.gbv.de/terminology/ddcdnb/",
+    "notation": [
+      "DDCDNB"
+    ],
+    "notationPattern": "[0-9]([0-9][0-9](\\.[0-9][0-9]?)?)?|[BKS]",
+    "prefLabel": {
+      "de": "DDC-Sachgruppen",
+      "en": "Subject Categories from the Deutsche Nationalbibliografie",
+      "und": "Sachgruppen der Deutschen Nationalbibliografie"
+    },
+    "uri": "http://bartoc.org/en/node/18497",
+    "uriPattern": null
+  },
+  {
+    "PICAPATH": "045F$a",
+    "identifier": [
+      "http://www.wikidata.org/entity/Q48460",
+      "http://dewey.info/scheme/edition/e23/"
+    ],
+    "namespace": null,
+    "notation": [
+      "DDC"
+    ],
+    "notationPattern": "[0-9][0-9]?|[0-9]{3}(-[0-9]{3})?|[0-9]{3}\\.[0-9]+(-[0-9]{3}\\.[0-9]+)?|[1-9][A-Z]?--[0-9]+|[1-9][A-Z]?--[0-9]+(-[1-9][A-Z]?--[0-9]+)?",
+    "prefLabel": {
+      "en": "Dewey Decimal Classification"
+    },
+    "uri": "http://bartoc.org/en/node/241",
+    "uriPattern": "http://dewey.info/class/(.+)/e23/"
+  }
+]

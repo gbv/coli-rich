@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="de">
+ <head>
+  <meta charset="utf-8">
+  <title>coli-rich{{ ": " + title if title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+ </head>
+ <body>
+  <header>
+    <h1>coli-rich{{ ": " + title if title }}</h1>
+  </header>
+  <main>
+    {% block main %}{% endblock %}
+  </main>
+  <footer>
+    <ul>
+      <li>
+        <a href="terminologies">Vokabulare</a> 
+        (<a href="api/voc">API</a>)
+      </li>
+      <li>
+        <a href="api">API</a>
+      </li>
+      <li><a href="https://github.com/gbv/coli-rich">Quellcode</a></li>
+    </ul>
+  </footer>
+ </body>
+</html>

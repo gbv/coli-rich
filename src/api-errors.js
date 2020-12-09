@@ -16,13 +16,3 @@ export class NotFoundError extends HttpError {
     super(message, 404)
   }
 }
-
-// eslint-disable-next-line no-unused-vars
-export function errorHandler(err, req, res, next) {
-  const error = {
-    statusCode: err.statusCode || 500,
-    message: err.message,
-  }
-  res.status(error.statusCode)
-  res.json(error)
-}

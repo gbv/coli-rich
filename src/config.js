@@ -2,20 +2,6 @@ export default
 {
   // where to load records from
   unapi: "https://unapi.k10plus.de/",
-  databases: {
-    "opac-de-627": {
-      prefLabel: { de: "K10Plus" },
-      picabase: "https://opac.k10plus.de/",
-    },
-    "test-k10plus-kxpt": {
-      picabase: "https://kxpt.k10plus.de/DB=1.1/",
-      prefLabel: { de: "K10plus-Test (kxpt)" },
-    },
-    k10plus: {
-      picabase: "https://kxp.k10plus.de/DB=1.1/",
-      prefLabel: { de: "K10plus Katalogisierung (1.1)" },
-    },
-  },
   dbkey: "opac-de-627",
 
   // link into Cocoda

@@ -1,0 +1,34 @@
+[
+  {
+    "dbkey": "opac-de-627",
+    "picabase": "http://kxp.k10plus.de/DB=2.0/",
+    "srubase": "http://sru.k10plus.de/opac-de-627",
+    "title": {
+      "de": "K10plus-Verbundkatalog",
+      "en": "K10plus-Verbundkatalog"
+    },
+    "uri": "http://uri.gbv.de/database/opac-de-627",
+    "url": "https://kxp.k10plus.de/DB=2.0/"
+  },
+  {
+    "dbkey": "test-k10plus-kxpt",
+    "picabase": "http://gsot.gbv.de:9000/DB=1.1/",
+    "srubase": "http://sru.gbv.de/test-k10plus-kxpt",
+    "title": {
+      "de": "K10plus-Katalogisierungsdatenbank (kxpt)"
+    },
+    "uri": "http://uri.gbv.de/database/test-k10plus-kxpt",
+    "url": "http://gsot.gbv.de:9000/DB=1.1/"
+  },
+  {
+    "dbkey": "k10plus",
+    "picabase": "http://kxp.k10plus.de/DB=1.1/",
+    "srubase": "http://sru.k10plus.de/k10plus",
+    "title": {
+      "de": "K10plus-Katalogisierungsdatenbank",
+      "en": "K10plus-Katalogisierungsdatenbank"
+    },
+    "uri": "http://uri.gbv.de/database/k10plus",
+    "url": "https://kxp.k10plus.de/DB=1.1/"
+  }
+]

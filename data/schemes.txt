@@ -1,0 +1,4 @@
+http://uri.gbv.de/terminology/bk/
+http://uri.gbv.de/terminology/rvk/
+http://bartoc.org/en/node/18497
+http://dewey.info/scheme/edition/e23/

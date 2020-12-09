@@ -25,6 +25,7 @@ export default class Enricher {
 
     const url = this.avramApi + "?profile=k10plus&field=" + this.indexingFields.map(s=>s.fieldIdentifier()).join("|")
     this.avram = await this.fetchJSON(url)
+    // TODO: catch error and throw error message
   }
 
   extractIndexing(record) {

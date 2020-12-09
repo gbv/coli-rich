@@ -10,6 +10,7 @@
     "dev": "vite --config vite.config.cjs",
     "build": "vite --config vite.config.cjs build",
     "lint": "eslint --fix './{src,test}/**/*.{js,vue}' '*.js'",
+    "start": "nodemon --es-module-specifier-resolution=node server.js",
     "test": "mocha --recursive"
   },
   "pre-commit": [
@@ -20,21 +21,23 @@
   },
   "dependencies": {
     "axios": "^0.20.0",
-    "cocoda-sdk": "github:gbv/cocoda-sdk#71fca0d",
-    "codemirror": "^5.57.0",
+    "cocoda-sdk": "^1.0.6",
+    "codemirror": "^5.58.3",
     "express": "^4.17.1",
     "jskos-tools": "^1.0.14",
-    "pica-editor": "^0.4.6",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.0-beta.11"
+    "nunjucks": "^3.2.2",
+    "pica-editor": "^0.4.9",
+    "vue": "^3.0.4",
+    "vue-router": "^4.0.1"
   },
   "devDependencies": {
-    "eslint": "^7.9.0",
+    "eslint": "^7.15.0",
     "eslint-config-gbv": "git+https://github.com/gbv/eslint-config-gbv.git",
-    "eslint-plugin-vue": "^7.0.0-beta.3",
-    "mocha": "^8.1.3",
+    "eslint-plugin-vue": "^7.2.0",
+    "mocha": "^8.2.1",
     "mocha-eslint": "^6.0.0",
+    "nodemon": "^2.0.6",
     "pre-commit": "^1.2.2",
-    "vite": "^1.0.0-rc.4"
+    "vite": "^1.0.0-rc.13"
   }
 }
