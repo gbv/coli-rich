@@ -1,0 +1,14 @@
+<ul class="navbar">
+  {% for href, title in pages %}
+  <li class="{{ "selected" if href == path }}">
+    <a href="{{ href if href else "./" }}">{{ title }}</a> 
+  </li>
+  {% endfor %}
+  <li>
+    <a href="https://github.com/gbv/coli-rich">Quellcode</a>
+  </li>
+  <li>
+    <a href="https://github.com/gbv/coli-rich/issues">Issues</a>
+  </li>
+</ul>
+

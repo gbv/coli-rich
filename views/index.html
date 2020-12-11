@@ -1,6 +1,28 @@
 {% extends "layout.html" %}
 {% block main %}
 
-Hallo
+<p>
+  Mit coli-rich kann die Sacherschließung von PICA-Datensätzen auf Grundlage von Normdaten-Mappings angereichert werden.
+</p>
+
+<div class="mermaid">
+  graph TD
+    PICA-Datensatz
+    PICA-Datensatz -->|Extraktion| Sacherschließung
+    Sacherschließung --> E{Anreicherung}
+    Normdaten-Mappings -->|Auswahl| E
+    E--> Datensatz-Änderung
+    click PICA-Datensatz "./indexing"
+    click Sacherschließung "./indexing"
+    click Normdaten-Mappings "./mappings"
+</div>
+
+<p>
+  Weitere Informationen gibt es auf der 
+  <a href="https://coli-conc.gbv.de/de/coli-rich/">coli-rich Projektseite</a>.
+</p>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true});</script>
 
 {% endblock %}

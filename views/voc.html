@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block main %}
+<div id="app">
+
+<p>
+  Syntaktisch valide Notationen der folgenden Vokabulare werden in den entsprechenden PICA-Feldern als
+  <a href="indexing">Sacherschließungsdaten</a> erkannt und für die Anreicherung verwendet:
+</p>
+
+<schemes-table :schemes="schemes"></schemes-table>
+
+<p>
+  Die Liste lässt sich über <a href="api">die API</a> unter <a href="api/voc">/voc</a> abrufen.
+</p>
+
+</div>
+{% endblock %}

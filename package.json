@@ -7,10 +7,12 @@
   },
   "license": "MIT",
   "scripts": {
-    "dev": "vite --config vite.config.cjs",
-    "build": "vite --config vite.config.cjs build",
+    "dev": "concurrently \"npm:express:serve\" \"npm:vue:serve\"",
+    "start": "NODE_ENV=production nodemon --es-module-specifier-resolution=node server.js",
+    "express:serve": "NODE_ENV=development nodemon --es-module-specifier-resolution=node server.js",
+    "vue:serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
     "lint": "eslint --fix './{src,test}/**/*.{js,vue}' '*.js'",
-    "start": "nodemon --es-module-specifier-resolution=node server.js",
     "test": "mocha --recursive"
   },
   "pre-commit": [
@@ -31,13 +33,25 @@
     "vue-router": "^4.0.1"
   },
   "devDependencies": {
+    "@vue/cli-service": "^4.5.9",
+    "@vue/compiler-sfc": "^3.0.4",
+    "concurrently": "^5.3.0",
     "eslint": "^7.15.0",
     "eslint-config-gbv": "git+https://github.com/gbv/eslint-config-gbv.git",
     "eslint-plugin-vue": "^7.2.0",
     "mocha": "^8.2.1",
     "mocha-eslint": "^6.0.0",
     "nodemon": "^2.0.6",
-    "pre-commit": "^1.2.2",
-    "vite": "^1.0.0-rc.13"
+    "pre-commit": "^1.2.2"
+  },
+  "vue": {
+    "pages": {
+      "app": "vue/main.js"
+    },
+    "css": {
+      "extract": false
+    },
+    "runtimeCompiler": true,
+    "filenameHashing": false
   }
 }

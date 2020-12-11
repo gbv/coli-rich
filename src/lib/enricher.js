@@ -1,43 +1,20 @@
-import { picaSchemes, indexingFromPica } from "./pica-jskos.js"
 import { mappingsByFromConcept, enrichIndexing } from "./indexing.js"
-import { PicaPath } from "pica-data"
 
 export default class Enricher {
 
   constructor(config) {
-        
-    // configuration (required)
     this.mappingApi = config.mappingApi
-    this.avramApi = config.avramApi
-    this.profile = "k10plus"
     this.fetchJSON = config.fetchJSON
-
-    // is set via setSchemes
-    this.schemes = {}
-    this.avram = undefined
+    this.schemes = config.schemes
   }    
 
-  // set concept schemes and load Avram schema with PICA fields listed in schemes
-  async setSchemes(schemes) {
-    this.schemes = picaSchemes(schemes)
-        
-    this.indexingFields = [new PicaPath("003@"),...Object.values(this.schemes).map(s => s.PICAPATH)]
-
-    const url = this.avramApi + "?profile=k10plus&field=" + this.indexingFields.map(s=>s.fieldIdentifier()).join("|")
-    this.avram = await this.fetchJSON(url)
-    // TODO: catch error and throw error message
-  }
-
-  extractIndexing(record) {
-    return indexingFromPica(record || [], this.schemes)
-  }
-
-  async enrich(indexing, options) {
+  async enrich(indexing, { from, toScheme }) {
     const query = {
-      fromScheme: options.fromScheme.join("|"),
-      from:       options.from.join("|"),
-      toScheme:   options.toScheme.join("|"),
+      from:       (from||[]).join("|"),
+      toScheme:   (toScheme||[]).join("|"),
     }
+
+    // TODO: support multiple strategies
 
     const mappings = await this.fetchJSON(`${this.mappingApi}?` + new URLSearchParams(query))
     const mappingsFrom = mappingsByFromConcept(mappings)
@@ -53,6 +30,4 @@ export default class Enricher {
 
     return enrichIndexing(indexing, mappingsFrom)
   }
-
-
 }

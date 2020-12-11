@@ -30,10 +30,7 @@ A list of configured concept schemes is made available at `/voc`. The base URL `
 
 ## Development
 
-The application is written in ECMAScript 2015 (ES6) with [Vue3] and [Vite].
-
-[Vue3]: https://v3.vuejs.org/
-[vite]: https://github.com/vitejs/vite#readme
+The application is written in ECMAScript 2015 (ES6) with [Vue3](https://v3.vuejs.org/).
 
 Install dependencies and start developer instance:
 

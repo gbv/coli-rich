@@ -1,3 +1,5 @@
+import { indexingFromPica } from "./lib/pica-jskos.js"
+
 import schemes from "../data/schemes"
 import databases from "../data/databases"
 import config from "./config"
@@ -17,8 +19,7 @@ import { indexingToPica } from "./lib/pica-jskos.js"
 import { serializePica, serializePicaField } from "pica-data"
 
 import Enricher from "./lib/enricher.js"
-const enricher = new Enricher({...config, fetchJSON })
-enricher.setSchemes(schemes)
+const enricher = new Enricher({...config, schemes })
 
 async function getIndexings(id) {
   if (!id) {
@@ -35,7 +36,7 @@ async function getIndexings(id) {
   const url = `${config.unapi}?id=${id}&format=picajson`
   const record = await fetchJSON(url).catch(() => { throw new NotFoundError(`PICA record not found: ${id}`) })
 
-  return enricher.extractIndexing(record)
+  return indexingFromPica(record, schemes)
 }
 
 export async function indexingHandler (req, res, next) {
@@ -45,10 +46,10 @@ export async function indexingHandler (req, res, next) {
     const indexing = await getIndexings(id)
 
     if (format === "picajson") { 
-      res.send(indexingToPica(indexing, enricher.schemes))
+      res.send(indexingToPica(indexing, schemes))
     } else if (format === "pp") {
       const ppn = id.split(":").pop()
-      const pica = serializePica(indexingToPica(indexing, enricher.schemes))
+      const pica = serializePica(indexingToPica(indexing, schemes))
       sendText(res, "003@ $0" + ppn + "\n" + pica)
     } else {
       res.json(indexing)
@@ -59,15 +60,15 @@ export async function indexingHandler (req, res, next) {
 }
 
 export async function enrichHandler (req, res, next) {
-  var { id, format, fromScheme, toScheme } = req.query
+  const { id, format } = req.query
 
   try {
     const indexing = await getIndexings(id)
     const ppn = id.split(":").pop()
 
-    // defaults
-    fromScheme = fromScheme ? fromScheme.split("|") : Object.values(enricher.schemes).map(s => s.uri)
-    toScheme = toScheme ? toScheme.split("|") : Object.values(enricher.schemes).map(s => s.uri)
+    // TODO: support fromScheme and toScheme
+    var fromScheme = schemes.map(s => s.uri)
+    var toScheme = schemes.map(s => s.uri)
 
     // <TODO>
     // TODO: move to Enricher, this lines duplicated in App.vue
@@ -75,6 +76,7 @@ export async function enrichHandler (req, res, next) {
     fromScheme = fromScheme.filter(uri => !isEmpty(indexing[uri]))
     fromScheme.map(uri => (indexing[uri] || []).forEach(c => from.add(c.uri)))
     from = Array.from(from)
+    console.log(from)
 
     const diff = await enricher.enrich(indexing, { fromScheme, toScheme, from })
     if (format === "diff") {
@@ -84,7 +86,7 @@ export async function enrichHandler (req, res, next) {
       var pica = ["  003@ $0" + ppn]
       if (diff.add) {
         pica.push(
-          ...indexingToPica(diff.add, enricher.schemes).map(field => "+ " + serializePicaField(field)),
+          ...indexingToPica(diff.add, schemes).map(field => "+ " + serializePicaField(field)),
         )
       }
       // TODO: fields to remove

@@ -1,12 +1,37 @@
-import app from "./src/app"
+import express from "express"
+import nunjucks from "nunjucks"
+
 import config from "./src/config"
 import { enrichHandler, indexingHandler } from "./src/enrich"
 import schemes from "./data/schemes"
 import databases from "./data/databases"
 
-app.get("/", (req, res) => res.render("index") )
-app.get("/terminologies", (req, res) => res.render("terminologies") )
-app.get("/api", (req, res) => res.render("api") )
+const app = express()
+
+app.set("json spaces", 2)
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*")
+  next()
+})
+
+app.use(express.static("./static"))
+app.use("/dist/", express.static("dist"))
+
+app.set("views", "../views")
+app.set("view engine", "html")
+nunjucks.configure("views", { express: app, autoescape: true })
+
+const pages = {
+  "": "coli-rich",
+  voc: "Vokabulare",
+  indexing: "Sacherschließung",
+  mappings: "Mappings",
+  api: "API",
+}
+for (let [path, title] of Object.entries(pages)) {
+  app.get(`/${path}`, (req, res) => res.render(path || "index", { pages, title, path }) )
+}
 
 app.get("/api/voc", (req, res) => res.json(schemes))
 app.get("/api/databases", (req, res) => res.json(databases))

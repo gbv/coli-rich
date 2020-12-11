@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block main %}
+<div id="app">
+
+<p>
+  Für eine Reihe von <a href="voc">unterstützen Vokabularen</a> kann coli-rich Sacherschließungsdaten aus
+  PICA-Datensätzen extrahieren und mittels <a href="mappings">Normdaten-Mappings</a> anreichern. Im
+  folgenden Formular lassen sich die Sacherschließungsdaten aus PICA-Datenbanken abrufen oder direkt
+  PICA-Daten eingeben:
+</p>  
+
+<!-- TODO: allow to select database -->
+<!-- TODO: configure avram -->
+
+<pica-editor :unapi="'api/indexing'" 
+             :avram="'https://format.k10plus.de/avram.pl?profile=k10plus'"
+             :picabase="'http://opac.k10plus.de/'" 
+             :dbkey="'opac-de-627'"
+             @update:record="updateRecord"
+></pica-editor>
+
+<div v-if="Object.keys(indexing).length">
+  <p>↓ <i>Extraktion</i></p>
+  <indexing-table :indexing="indexing" :schemes="schemes"></indexing-table>
+</div>
+
+</div>
+{% endblock %}

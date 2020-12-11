@@ -16,11 +16,15 @@ export const picaSchemes = array =>
     return schemes
   }, {})
 
+const ensureScheme = scheme => scheme instanceof ConceptScheme ? scheme : new ConceptScheme(scheme)
+const ensurePath = path => path instanceof PicaPath ? path : new PicaPath(path)
+
 // extract indexing with known pica schemes from PICA record
 export const indexingFromPica = (record, schemes) => {
   const indexing = {}
-  for (const scheme of Object.values(schemes)) {
-    const path = scheme.PICAPATH
+  for (let scheme of schemes) {
+    scheme = ensureScheme(scheme)
+    const path = ensurePath(scheme.PICAPATH)
     const values = path.getUniqueValues(record)
     if (values.length) {
       const toConcept = n => scheme.conceptFromNotation(n, { inScheme: true })
@@ -35,14 +39,14 @@ export const indexingToPica = (indexing, schemes) => {
   const pica = []
   const occCounter = {}
 
-  for (const schemeUri in indexing) {
-    const scheme = schemes[schemeUri]
-
+  for (const uri in indexing) {
+    let scheme = schemes.find(s => s.uri === uri || (s.identifier||[]).find(i => i === uri))
     if (!scheme || !scheme.PICAPATH) continue
-    const path = scheme.PICAPATH instanceof PicaPath
-      ? scheme.PICAPATH : new PicaPath(scheme.PICAPATH)
 
-    indexing[schemeUri].forEach(concept => {
+    scheme = ensureScheme(scheme)
+    const path = ensurePath(scheme.PICAPATH)
+
+    indexing[uri].forEach(concept => {
       const notation = concept.notation[0]
 
       var id   = path.toString()

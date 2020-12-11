@@ -1,4 +1,3 @@
-{% set title = "API" %}
 {% extends "layout.html" %}
 {% block main %}
 
@@ -26,22 +25,21 @@
     <dt><code>id={dbkey}:ppn:{ppn}</code></dt>
     <dd><p>Auswahl des PICA-Datensatz per Datenbank-Kürzel und PPN</p></dd>
     <dt><code>format={format}</code></dt>
-    <dd>
-    <p>Rückgabeformat (<code>picajson</code>, <code>pp</code>, 
-    oder Erschließungsdaten als <code>json</code> mit noch nicht festgelegter Struktur)</p>
-    </dd>
+    <dd><p>
+    <code>picajson</code> in <a href="https://format.gbv.de/pica/json">PICA JSON</a><br>
+    <code>pp</code> in <a href="https://format.gbv.de/pica/plain">PICA Plain</a><br>
+    <code>json</code> in der intern von coli-rich verwendeten JSON-Struktur
+    </p></dd>
   </dl>
 </p>
 
 <h2>GET <a href="api/enrich">/enrich</a></h2>
 <p>
-  Liefert auf Grundlage von Normdaten-Mappings ermittelte Anreicherung von PICA-Datensätzen.
-  <ul>
-    <li>
-      <p><b>URL Parameter</b></p>
-      <p><code>id={dbkey}:ppn:{ppn}</code> Auswahl des PICA-Datensatz per Datenbank-Kürzel und PPN</p>
-    </li>
-  </ul>
+  Liefert auf Grundlage von Normdaten-Mappings ermittelte Anreicherung von PICA-Datensätzen. URL-Parameter:
+  <dl>
+    <dt><code>id={dbkey}:ppn:{ppn}</code></dt>
+    <dd><p>Auswahl des PICA-Datensatz per Datenbank-Kürzel und PPN</p></dd>
+  </dl>
 </p>
 
 {% endblock %}
