@@ -1,5 +1,8 @@
 [
   {
+    "API": [
+      "http://api.dante.gbv.de/"
+    ],
     "PICAPATH": "045Q[01-09]$a",
     "identifier": [
       "http://id.loc.gov/vocabulary/classSchemes/bkl",
@@ -19,7 +22,10 @@
     "uriPattern": null
   },
   {
-    "PICAPATH": "045R",
+    "API": [
+      "https://coli-conc.gbv.de/rvk/api/"
+    ],
+    "PICAPATH": "045R$a",
     "identifier": [
       "http://www.wikidata.org/entity/Q2137453",
       "http://uri.gbv.de/terminology/rvk/"
@@ -37,6 +43,9 @@
     "uriPattern": null
   },
   {
+    "API": [
+      "https://coli-conc.gbv.de/api/"
+    ],
     "PICAPATH": "045G$a",
     "identifier": [
       "http://www.wikidata.org/entity/Q67011877",
@@ -49,13 +58,15 @@
     "notationPattern": "[0-9]([0-9][0-9](\\.[0-9][0-9]?)?)?|[BKS]",
     "prefLabel": {
       "de": "DDC-Sachgruppen",
-      "en": "Subject Categories from the Deutsche Nationalbibliografie",
-      "und": "Sachgruppen der Deutschen Nationalbibliografie"
+      "en": "Subject Categories from the Deutsche Nationalbibliografie"
     },
     "uri": "http://bartoc.org/en/node/18497",
     "uriPattern": null
   },
   {
+    "API": [
+      "https://coli-conc.gbv.de/api/"
+    ],
     "PICAPATH": "045F$a",
     "identifier": [
       "http://www.wikidata.org/entity/Q48460",

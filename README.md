@@ -2,14 +2,38 @@
 
 [![Build Status](https://travis-ci.org/gbv/coli-rich.svg?branch=master)](https://travis-ci.org/gbv/coli-rich)
 
-This repository contains a web application to illustrate and analyze the enrichment of PICA catalog records with subject indexing data from concordances collected in [project coli-conc](https://coli-conc.gbv.de/). The application consists of:
+This repository contains a web application to calculate, analyze and illustrate the enrichment of PICA catalog records with subject indexing data from concordances collected in [project coli-conc](https://coli-conc.gbv.de/). The application consists of a web interface and an API.
 
-* A web interface in German, deployed automatically at <https://gbv.github.io/coli-rich/>
-* A web service (not deployed yet)
+## Technical Background
+
+coli-rich extends [JSKOS](https://gbv.github.io/jskos/) format by Indexing Sets.
+
+An **Indexing Set** is a JSON object that maps Concept Scheme URIs to sets of concepts, each being `inScheme` of the corresponding Concept Scheme. A minimal example with one Concept Scheme and one Concept:
+
+~~~json
+{
+  "http://bartoc.org/en/node/18785": [
+    {
+      "uri": "http://uri.gbv.de/terminology/bk/43.31",
+      "notation": [ "43.31" ],
+      "inScheme": [
+        { 
+          "uri": "http://bartoc.org/en/node/18785" 
+        }
+      ]
+    }
+  ]
+}
+~~~
+
+The concepts in an Indexing Set can further have fields:
+
+* `PATCH` with value `=` (keep), `+` (add), or `-` (remove)
+* `mappings` with a set of mappings that resulted in addition or removal of the concepts
+
+Given the Concept Scheme field `PICAPATH`, an Indexing Set can be converted from and to PICA format or PICA Patch format.
 
 ## Usage
-
-Try out the web interface at <https://gbv.github.io/coli-rich/>.
 
 The web service can be started on port 3077:
 
@@ -17,16 +41,6 @@ The web service can be started on port 3077:
 npn run start
 ~~~
 
-A list of configured concept schemes is made available at `/voc`. The base URL `/` expects the following query parameters:
-
-* `id` (required) database key and ppn, e.g. `opac-de-627:ppn:168675535X` for K10Plus
-* `fromScheme` and `toScheme`: optional concept scheme URIs, separated by `|`
-* `format` response format (optional):
-  * `picajson`: original record, reduced to subject indexing fields in PICA/JSON syntax
-  * `pp`: original record, reduced to subject indexing fields in PICA Plain syntax
-  * `indexing`: subject indexing found in the original record
-  * `diff`: changes to be applied to the record in JSON format
-  * `ppdiff`: changes to be applied to the record in PICA+ change format (default)
 
 ## Development
 

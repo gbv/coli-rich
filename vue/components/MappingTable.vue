@@ -1,35 +1,23 @@
 <template>
-  <table v-if="(mappings||[]).length">
+  <table class="mapping-table">
     <tbody
       v-for="m in mappings"
       :key="m.uri">
       <tr>
         <td>
+          <scheme-link :scheme="m.fromScheme" style="padding-right: 0.5em" />            
+          <concept-link :concept="m.from.memberSet[0]" />
+        </td>
+        <td>
           <a :href="cocoda ? cocoda + '?mappingUri=' + m.uri : m.uri">{{ mappingTypeSymbol(m) }}</a>
         </td>
         <td>
-          <ul v-if="m.to && m.to.memberSet.length">
-            <li
-              v-for="concept in m.to.memberSet"
-              :key="concept.uri">
-              <span
-                v-if="m.toScheme && m.toScheme.notation"
-                class="scheme">
-                {{ m.toScheme.notation[0] }}
-              </span>
-              <concept-link :concept="concept" />
-              <span
-                v-if="(m.creator||[]).length"
-                class="secondary">
-                by <concept-link :concept="m.creator[0]" />
-              </span>
-              <span
-                v-if="m.created"
-                class="secondary">
-                at {{ m.created }}
-              </span>
-            </li>
-          </ul>
+          <span v-if="(m.creator||[]).length">
+            <concept-link :concept="m.creator[0]" />
+          </span>
+          <span v-if="m.created">
+            at {{ m.created }}
+          </span>
         </td>
       </tr>
     </tbody>
@@ -38,10 +26,12 @@
 
 <script>
 import ConceptLink from "./ConceptLink.vue"
+import SchemeLink from "./SchemeLink.vue"
+import { mappingTypes } from "jskos-tools"
 
 export default {
-  components: { ConceptLink },
-  inject: ["cocoda", "jskos"],
+  components: { ConceptLink, SchemeLink },
+  inject: ["cocoda"],
   props: {
     mappings: {
       type: Array,
@@ -51,25 +41,15 @@ export default {
   methods: {
     mappingTypeSymbol(mapping) {
       const uri = mapping.type ? mapping.type[0] : "http://www.w3.org/2004/02/skos/core#mappingRelation"
-      const type = this.jskos.mappingTypes.find(m => m.uri === uri)
+      const type = mappingTypes.find(m => m.uri === uri)
       return type ? type.notation[0] : "?"
     },
   },
 }
 </script>
 
-<style scoped>
-.secondary {
+<style>
+.mapping-table {
   font-size: smaller;
-}
-.scheme {
-  padding-right: 0.5em;
-}
-ul {
-  list-style-type: none;
-  padding-left: 0em;
-}
-ul.mapping-list {
-  padding-left: 1em;
 }
 </style>

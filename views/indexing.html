@@ -1,28 +1,62 @@
 {% extends "layout.html" %}
 {% block main %}
+{% raw %}
 <div id="app">
 
 <p>
-  Für eine Reihe von <a href="voc">unterstützen Vokabularen</a> kann coli-rich Sacherschließungsdaten aus
-  PICA-Datensätzen extrahieren und mittels <a href="mappings">Normdaten-Mappings</a> anreichern. Im
-  folgenden Formular lassen sich die Sacherschließungsdaten aus PICA-Datenbanken abrufen oder direkt
-  PICA-Daten eingeben:
+  Sacherschließungsdaten <a href="voc">unterstützer Vokabulare</a> 
+  können aus PICA-Datensätzen extrahieren und mittels <a href="mappings">Normdaten-Mappings</a> angereichert werden. 
+</p>
+<p>
+  Im folgenden Formular lassen sich die Sacherschließungsdaten aus PICA-Datenbanken abrufen
+  oder direkt PICA-Daten eingeben:
 </p>  
 
-<!-- TODO: allow to select database -->
-<!-- TODO: configure avram -->
+<!-- TODO: allow to select database and avram profile -->
 
-<pica-editor :unapi="'api/indexing'" 
-             :avram="'https://format.k10plus.de/avram.pl?profile=k10plus'"
+<p>
+  <small>
+    <ul class="inline">
+      <li v-for="ppn in examples" :key="ppn">
+        <a @click="loadRecord(ppn)">{{ppn}}</a>
+      </li>
+    </ul>
+  </small>
+</p>
+
+<pica-editor ref="recordEditor"
+             :unapi="'api/indexing'" 
+             :avram="avram"
              :picabase="'http://opac.k10plus.de/'" 
-             :dbkey="'opac-de-627'"
+             :dbkey="dbkey"
              @update:record="updateRecord"
+             @update:ppn="updatePPN"
 ></pica-editor>
 
 <div v-if="Object.keys(indexing).length">
-  <p>↓ <i>Extraktion</i></p>
-  <indexing-table :indexing="indexing" :schemes="schemes"></indexing-table>
+  <p>
+    <b>↓ <i>Extraktion</i>
+    <span v-if="ppn"> (<a :href="`api/indexing?id=${dbkey}:ppn:${ppn}`">API</a>)</span>
+    </b>
+  </p>
+  <indexing-set :indexing="indexing" :schemes="schemes"></indexing-set>
+
+  <p>
+    <b>↓ <i>Anreicherung</i>
+    <span v-if="ppn"> (<a :href="`api/enrich?id=${dbkey}:ppn:${ppn}&format=indexing`">API</a>)</span>
+    </b>
+  </p>
+
+  <indexing-set :indexing="enrichedIndexing" :schemes="schemes"></indexing-set>
+
+  <p>
+    <b>↓ <i>Datensatz-Änderung</i>
+    <span v-if="ppn"> (<a :href="`api/enrich?id=${dbkey}:ppn:${ppn}`">API</a>)</span>
+    </b>
+  </p>
+
+  ...TODO...
 </div>
 
-</div>
+{% endraw %}
 {% endblock %}

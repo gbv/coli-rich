@@ -15,10 +15,12 @@
       <tr
         v-for="scheme in schemes"
         :key="scheme.uri">
-        <td>{{ scheme.notation[0] }}</td>
+        <td>
+          <scheme-link :scheme="scheme"></scheme-link>
+        </td>
         <td>{{ scheme.prefLabel.de }}</td>
-        <td><a :href="cocoda+'?fromScheme='+scheme.uri">↦ </a></td>
-        <td><a :href="cocoda+'?toScheme='+scheme.uri">⇥</a></td>
+        <td><a :href="`${cocoda}?fromScheme=${scheme.uri}`">↦ </a></td>
+        <td><a :href="`${cocoda}?toScheme=${scheme.uri}`">⇥</a></td>
         <td>
           <PicaPath
             :path="scheme.PICAPATH"
@@ -34,9 +36,10 @@
 
 <script>
 import PicaPath from "./PicaPath.vue"
+import SchemeLink from "./SchemeLink.vue"
 
 export default {
-  components: { PicaPath },
+  components: { PicaPath, SchemeLink },
   inject: ["cocoda"],
   props: ["schemes","avram"]
 } 

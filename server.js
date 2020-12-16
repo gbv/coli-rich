@@ -30,7 +30,7 @@ const pages = {
   api: "API",
 }
 for (let [path, title] of Object.entries(pages)) {
-  app.get(`/${path}`, (req, res) => res.render(path || "index", { pages, title, path }) )
+  app.get(`/${path}`, (req, res) => res.render(path || "index", { pages, title, path, config }) )
 }
 
 app.get("/api/voc", (req, res) => res.json(schemes))
@@ -44,6 +44,7 @@ app.use((err, req, res, next) => {
     statusCode: err.statusCode || 500,
     message: err.message,
   }
+  console.error(err)
   res.status(error.statusCode)
   res.json(error)
 })

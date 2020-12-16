@@ -17,7 +17,7 @@ import { PicaPath, picaFieldSchedule } from "pica-data"
 export default {
   props: {
     path: {
-      type: PicaPath,
+      type: [PicaPath, String],
       default: null,
     },
     avram: {
@@ -26,12 +26,15 @@ export default {
     },
   },
   computed: {
+    pathObject() {
+      return this.path instanceof PicaPath ? this.path : new PicaPath(this.path)
+    },
     pathString() {
-      return this.path ? this.path.toString() : ""
+      return this.pathObject.toString()
     },
     schedule() {
-      const { path } = this
-      if (path) {
+      if (this.path) {
+        const path = this.pathObject
         return picaFieldSchedule(this.avram, [path.tagString(), path.startOccurrence()])
       } else {
         return null

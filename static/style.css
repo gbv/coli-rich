@@ -25,11 +25,11 @@ a:hover {
 }
 ul.inline {
   display: inline;
-  list-style: none;
   padding: 0px;
 }
 ul.inline li {
   display: inline;
+  list-style: none;
 }
 ul.inline li:after {
   content: ", ";
@@ -57,4 +57,13 @@ ul.navbar li + li::before {
 }
 li.selected {
     font-weight: bold;
+}
+dl.params dt {
+    font-family: monospace;
+}
+dl.params dd {
+    padding: 0.5em 0;
+}
+dl.params dl {
+    margin: 0;
 }

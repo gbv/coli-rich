@@ -1,4 +1,4 @@
-import { indexingFromPica } from "./lib/pica-jskos.js"
+import { indexingFromPica, serializeDiff } from "./lib/pica-jskos.js"
 
 import schemes from "../data/schemes"
 import databases from "../data/databases"
@@ -14,12 +14,8 @@ const sendText = (res, text) => {
   res.send(text)
 }
 
-import { isEmpty } from "./lib/utils.js"
 import { indexingToPica } from "./lib/pica-jskos.js"
-import { serializePica, serializePicaField } from "pica-data"
-
-import Enricher from "./lib/enricher.js"
-const enricher = new Enricher({...config, schemes })
+import { serializePica } from "pica-data"
 
 async function getIndexings(id) {
   if (!id) {
@@ -59,45 +55,32 @@ export async function indexingHandler (req, res, next) {
   }
 }
 
+import Enricher from "./lib/enricher.js"
+const enricher = new Enricher({ ...config, schemes })
+
 export async function enrichHandler (req, res, next) {
-  const { id, format } = req.query
+  const { id, format, strategy } = req.query
 
   try {
-    const indexing = await getIndexings(id)
-    const ppn = id.split(":").pop()
-
-    // TODO: support fromScheme and toScheme
-    var fromScheme = schemes.map(s => s.uri)
-    var toScheme = schemes.map(s => s.uri)
-
-    // <TODO>
-    // TODO: move to Enricher, this lines duplicated in App.vue
-    var from = new Set()
-    fromScheme = fromScheme.filter(uri => !isEmpty(indexing[uri]))
-    fromScheme.map(uri => (indexing[uri] || []).forEach(c => from.add(c.uri)))
-    from = Array.from(from)
-    console.log(from)
-
-    const diff = await enricher.enrich(indexing, { fromScheme, toScheme, from })
-    if (format === "diff") {
-      res.json(diff)
+    const indexing = await enricher.enrich(await getIndexings(id), strategy)
+    
+    if (format === "indexing") {
+      res.json(indexing)
     } else {
-      // TODO: move to pica-data library
-      var pica = ["  003@ $0" + ppn]
-      if (diff.add) {
-        pica.push(
-          ...indexingToPica(diff.add, schemes).map(field => "+ " + serializePicaField(field)),
-        )
-      }
-      // TODO: fields to remove
+        // TODO: create diff from enrichedIndexing
 
-      sendText(res, pica.join("\n"))
+        /*if( format === "diff" ) {
+    
+        const ppn = id.split(":").pop()
+        diff.unshift(["=", "003@", null, "0", ppn])
+
+        if (format === "diff") {
+          res.json(diff)
+        } else {
+          sendText(res, serializeDiff(diff))
+        }*/
     }
-    // </TODO>
-
   } catch(error) {
     next(error)
   }
-
-
 }

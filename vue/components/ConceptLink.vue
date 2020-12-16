@@ -38,5 +38,6 @@ export default {
 <style scoped>
 .notation {
   font-weight: bold;
+  padding-right: 0.5em;
 }
 </style>

@@ -5,7 +5,7 @@
 import jskos from "jskos-tools"
 const { ConceptScheme } = jskos
 
-import { PicaPath } from "pica-data"
+import { PicaPath, serializePicaField } from "pica-data"
 
 // Create a set of JSKOS concept schemes with PICAPATH
 export const picaSchemes = array =>
@@ -63,8 +63,9 @@ export const indexingToPica = (indexing, schemes) => {
 
       const field = [path.tagString(), occ]
       field.push(path.subfieldString(), notation)
-      if (concept.SOURCE) {
-        field.push("A", concept.SOURCE)
+      const { SOURCE } = concept
+      if (SOURCE) {
+        SOURCE.forEach(s => field.push("A", s))
       }
 
       pica.push(field)
@@ -73,3 +74,8 @@ export const indexingToPica = (indexing, schemes) => {
 
   return pica
 }
+
+export const serializeDiff = diff => diff.map(([op, ...field]) => {
+  op = op === "=" ? " " : op
+  return op + " " + serializePicaField(field)
+}).join("\n")

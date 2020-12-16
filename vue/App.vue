@@ -1,18 +1,22 @@
 <script>
 import SchemesTable from "./components/SchemesTable.vue"
-import IndexingTable from "./components/IndexingTable.vue"
+import IndexingSet from "./components/IndexingSet.vue"
 import PicaEditor from "pica-editor"
 
 import { indexingFromPica } from "../src/lib/pica-jskos"
 
 import Enricher from "../src/lib/enricher"
 import jskos from "jskos-tools"
+const { ConceptScheme } = jskos
+import { PicaPath } from "pica-data"
 
 import config from "../src/config.js"
-import { isEmpty, fetchJSON } from "../src/lib/utils.js"
+import { fetchJSON } from "../src/lib/utils.js"
+import cdk from "cocoda-sdk"
+
 
 export default {
-  components: { SchemesTable, PicaEditor, IndexingTable },
+  components: { SchemesTable, PicaEditor, IndexingSet },
   provide() {
     return { jskos, cocoda: config.cocoda }
   },
@@ -20,6 +24,12 @@ export default {
     return {
         indexing: {},
         schemes: [],
+        avram: undefined,
+        enricher: undefined,
+        enrichedIndexing: {},
+        dbkey: 'opac-de-627',
+        ppn: undefined,        
+        examples: config.examples,
     }
   },
   created() {
@@ -27,26 +37,53 @@ export default {
   },    
   methods: {
       async loadSchemes() {
-        this.schemes = await fetchJSON("api/voc")
+        const schemes =(await fetchJSON("api/voc")).map(s => new ConceptScheme(s))
+
+        for (let s of schemes) { 
+            const api = s.API ? s.API[0] : undefined
+            if (api) {
+              s.REGISTRY = await cdk.initializeRegistry({ api, provider: "ConceptApi" })
+            }
+        }
+
+        this.schemes = schemes
+
+        this.profile = "k10plus"
+        const indexingFields = ["003@",...Object.values(schemes).map(s => s.PICAPATH)].map(p => new PicaPath(p))
+        const url = config.avramApi + "?profile=" + this.profile + "&field=" + indexingFields.map(s=>s.fieldIdentifier()).join("|")
+        this.avram = await fetchJSON(url)
+
+        this.enricher = new Enricher({ ...config, schemes })
+      },      
+      updatePPN(ppn) {
+        this.ppn = ppn
       },
+      loadRecord(ppn) {
+        // Use $nextTick to give dbkey the chance to propagate to PicaEditor
+        this.$nextTick(() => {
+          this.$refs.recordEditor.loadRecord(ppn)
+        })
+      },
+
       async updateRecord(record) {
         this.indexing = indexingFromPica(record, this.schemes)
+        await this.loadConceptLabels(this.indexing)
+
+        this.enrichedIndexing = await this.enricher.enrich(this.indexing)
+        await this.loadConceptLabels(this.enrichedIndexing)
+      },
+
+      async loadConceptLabels(indexingSet) {
+        for (let [uri, concepts] of Object.entries(indexingSet)) {
+            const scheme = this.schemes.find(s => s.uri === uri)
+            if (scheme && scheme.REGISTRY && concepts.length) {
+              const found = await scheme.REGISTRY.getConcepts({ concepts })
+              for (let {uri, prefLabel} of found) {
+                  concepts.find(c => c.uri === uri).prefLabel = prefLabel
+              }
+            }
+        }
       }
   }
 }
-/*
-  // set concept schemes and load Avram schema with PICA fields listed in schemes
-  _setSchemes(schemes) {
-    this.profile = "k10plus"
-    this.avramApi = config.avramApi
-    this.avram = undefined
-    this.schemes = picaSchemes(schemes)
-        
-    this.indexingFields = [new PicaPath("003@"),...Object.values(this.schemes).map(s => s.PICAPATH)]
-
-    const url = this.avramApi + "?profile=" + this.profile + "&field=" + this.indexingFields.map(s=>s.fieldIdentifier()).join("|")
-    this.fetchJSON(url).then(avram => { this.avram = avram })
-    // TODO: catch error and throw error message
-  }
-*/
 </script>

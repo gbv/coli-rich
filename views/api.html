@@ -21,24 +21,36 @@
 <h2>GET <a href="api/indexing">/indexing</a></h2>
 <p>
   Liefert die in einem PICA-Datensatz enthaltenen Normdaten der unterstützen Vokabulare. URL-Parameter:
-  <dl>
-    <dt><code>id={dbkey}:ppn:{ppn}</code></dt>
-    <dd><p>Auswahl des PICA-Datensatz per Datenbank-Kürzel und PPN</p></dd>
-    <dt><code>format={format}</code></dt>
-    <dd><p>
-    <code>picajson</code> in <a href="https://format.gbv.de/pica/json">PICA JSON</a><br>
-    <code>pp</code> in <a href="https://format.gbv.de/pica/plain">PICA Plain</a><br>
-    <code>json</code> in der intern von coli-rich verwendeten JSON-Struktur
-    </p></dd>
+  <dl class="params">
+    <dt>id={dbkey}:ppn:{ppn}</dt>
+    <dd>Auswahl des PICA-Datensatz per Datenbank-Kürzel und PPN</dd>
+    <dt>format={format}</dt>
+    <dd>
+      <dl class="params">
+        <dt>picajson</dt>
+        <dd><a href="https://format.gbv.de/pica/json">PICA JSON</a></dd>
+        <dt>pp</dt>
+        <dd><a href="https://format.gbv.de/pica/plain">PICA Plain</a></dd>
+        <dt>json</dt>
+        <dd>als Indexing Set (die intern von coli-rich verwendeten JSON-Struktur)</dd>
+      </dl>
+    </dd>
   </dl>
 </p>
 
 <h2>GET <a href="api/enrich">/enrich</a></h2>
 <p>
   Liefert auf Grundlage von Normdaten-Mappings ermittelte Anreicherung von PICA-Datensätzen. URL-Parameter:
-  <dl>
-    <dt><code>id={dbkey}:ppn:{ppn}</code></dt>
-    <dd><p>Auswahl des PICA-Datensatz per Datenbank-Kürzel und PPN</p></dd>
+  <dl class="params">
+    <dt>id={dbkey}:ppn:{ppn}</dt>
+    <dd>Auswahl des PICA-Datensatz per Datenbank-Kürzel und PPN</dd>
+    <dt>format</dt>
+    <dd>
+      <dl class="params">
+        <dt>indexing</dt>
+        <dd>Indexing Set</dd>
+      </dl>
+    </dd>
   </dl>
 </p>
 
