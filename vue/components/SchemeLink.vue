@@ -4,11 +4,12 @@
 
 <script>
 // Shows notation of a scheme, linked to BARTOC
-import PicaPath from "./PicaPath.vue"
-import SchemeLink from "./SchemeLink.vue"
-
 export default {
-  components: { SchemeLink },
-  props: ["scheme"]
-} 
+  props: {
+    scheme: {
+      type: Array,
+      required: true,
+    },
+  },
+}
 </script>

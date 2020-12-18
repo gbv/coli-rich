@@ -7,6 +7,8 @@
   Sacherschließungsdaten <a href="voc">unterstützer Vokabulare</a> 
   können aus PICA-Datensätzen extrahieren und mittels <a href="mappings">Normdaten-Mappings</a> angereichert werden. 
 </p>
+
+<h2>PICA-Datensatz</h2>
 <p>
   Im folgenden Formular lassen sich die Sacherschließungsdaten aus PICA-Datenbanken abrufen
   oder direkt PICA-Daten eingeben:
@@ -18,7 +20,7 @@
   <small>
     <ul class="inline">
       <li v-for="ppn in examples" :key="ppn">
-        <a @click="loadRecord(ppn)">{{ppn}}</a>
+        <router-link :to="`?id=${dbkey}:ppn:${ppn}`">{{ppn}}</router-link>
       </li>
     </ul>
   </small>
@@ -34,28 +36,25 @@
 ></pica-editor>
 
 <div v-if="Object.keys(indexing).length">
-  <p>
-    <b>↓ <i>Extraktion</i>
+
+  <h2>↓ Extraktion
     <span v-if="ppn"> (<a :href="`api/indexing?id=${dbkey}:ppn:${ppn}`">API</a>)</span>
-    </b>
-  </p>
+  </h2>
+
   <indexing-set :indexing="indexing" :schemes="schemes"></indexing-set>
 
-  <p>
-    <b>↓ <i>Anreicherung</i>
+  <h2>↓ Anreicherung
     <span v-if="ppn"> (<a :href="`api/enrich?id=${dbkey}:ppn:${ppn}&format=indexing`">API</a>)</span>
-    </b>
-  </p>
+  </h2>
 
   <indexing-set :indexing="enrichedIndexing" :schemes="schemes"></indexing-set>
 
-  <p>
-    <b>↓ <i>Datensatz-Änderung</i>
+  <h2>↓ Datensatz-Änderung
     <span v-if="ppn"> (<a :href="`api/enrich?id=${dbkey}:ppn:${ppn}`">API</a>)</span>
-    </b>
-  </p>
+  </h2>
 
-  ...TODO...
+  <pre>{{diff}}</pre>
+
 </div>
 
 {% endraw %}

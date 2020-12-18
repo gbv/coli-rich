@@ -5,22 +5,23 @@
         v-for="(set, uri) in indexing"
         :key="uri">
         <td>
-          <scheme-link :scheme="getScheme(uri)"></scheme-link>
+          <scheme-link :scheme="getScheme(uri)" />
         </td>
         <td class="concepts">
           <ul class="concepts">
             <li
               v-for="concept in set"
               :key="concept.uri">
-            <div
-              :class="{ 
-                        add: concept.PATCH === '+',
-                        remove: concept.PATCH === '-',
-                        keep: concept.PATCH === '=',
-                      }">
-              <concept-link :concept="concept" />
-              <mapping-table :mappings="concept.mappings" v-if="concept.mappings">
-              </mapping-table>
+              <div
+                :class="{ 
+                  add: concept.PATCH === '+',
+                  remove: concept.PATCH === '-',
+                  keep: concept.PATCH === '=',
+                }">
+                <concept-link :concept="concept" />
+                <mapping-table
+                  v-if="concept.mappings"
+                  :mappings="concept.mappings" />
               </div>
             </li>
           </ul>
@@ -45,8 +46,8 @@ export default {
   methods: {
     getScheme(uri) {
       return this.schemes.find(s => s.uri === uri)
-    }
-  }
+    },
+  },
 }
 </script>
 

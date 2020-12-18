@@ -1,20 +1,25 @@
-import { indexingFromPica, serializeDiff } from "./lib/pica-jskos.js"
+import { indexingFromPica, indexingToPica, indexingToDiff, serializeDiff } from "./pica-jskos"
 
 import schemes from "../data/schemes"
 import databases from "../data/databases"
 import config from "./config"
 
-import { RequestError, NotFoundError } from "./api-errors.js"
+import { RequestError, NotFoundError } from "./api-errors"
+
+import Enricher from "./enricher.js"
 
 import axios from "axios"
-const fetchJSON = async url => axios.get(url).then(res => res.data)
+
+const getPicaRecord = async id => {
+  const url = `${config.unapi}?id=${id}&format=picajson`
+  return await axios.get(url).then(res => res.data).catch(() => { throw new NotFoundError(`PICA record not found: ${id}`) })
+}
 
 const sendText = (res, text) => {
   res.setHeader("Content-Type", "text/plain")
   res.send(text)
 }
 
-import { indexingToPica } from "./lib/pica-jskos.js"
 import { serializePica } from "pica-data"
 
 async function getIndexings(id) {
@@ -29,10 +34,7 @@ async function getIndexings(id) {
     throw new RequestError(`Database ${dbkey} not supported`)
   }
 
-  const url = `${config.unapi}?id=${id}&format=picajson`
-  const record = await fetchJSON(url).catch(() => { throw new NotFoundError(`PICA record not found: ${id}`) })
-
-  return indexingFromPica(record, schemes)
+  return indexingFromPica(await getPicaRecord(id), schemes)
 }
 
 export async function indexingHandler (req, res, next) {
@@ -41,7 +43,7 @@ export async function indexingHandler (req, res, next) {
   try {
     const indexing = await getIndexings(id)
 
-    if (format === "picajson") { 
+    if (format === "picajson") {
       res.send(indexingToPica(indexing, schemes))
     } else if (format === "pp") {
       const ppn = id.split(":").pop()
@@ -55,7 +57,6 @@ export async function indexingHandler (req, res, next) {
   }
 }
 
-import Enricher from "./lib/enricher.js"
 const enricher = new Enricher({ ...config, schemes })
 
 export async function enrichHandler (req, res, next) {
@@ -63,22 +64,19 @@ export async function enrichHandler (req, res, next) {
 
   try {
     const indexing = await enricher.enrich(await getIndexings(id), strategy)
-    
+
     if (format === "indexing") {
       res.json(indexing)
     } else {
-        // TODO: create diff from enrichedIndexing
+      const diff = indexingToDiff(indexing, schemes)
+      const ppn = id.split(":").pop()
+      diff.unshift(["=", "003@", null, "0", ppn])
 
-        /*if( format === "diff" ) {
-    
-        const ppn = id.split(":").pop()
-        diff.unshift(["=", "003@", null, "0", ppn])
-
-        if (format === "diff") {
-          res.json(diff)
-        } else {
-          sendText(res, serializeDiff(diff))
-        }*/
+      if ( format === "diff" ) {
+        res.json(diff)
+      } else {
+        sendText(res, serializeDiff(diff))
+      }
     }
   } catch(error) {
     next(error)

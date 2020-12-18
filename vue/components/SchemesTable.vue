@@ -1,5 +1,7 @@
 <template>
-  <table class="table" v-if="schemes">
+  <table
+    v-if="schemes"
+    class="table">
     <thead>
       <tr>
         <th />
@@ -16,7 +18,7 @@
         v-for="scheme in schemes"
         :key="scheme.uri">
         <td>
-          <scheme-link :scheme="scheme"></scheme-link>
+          <scheme-link :scheme="scheme" />
         </td>
         <td>{{ scheme.prefLabel.de }}</td>
         <td><a :href="`${cocoda}?fromScheme=${scheme.uri}`">↦ </a></td>
@@ -41,6 +43,15 @@ import SchemeLink from "./SchemeLink.vue"
 export default {
   components: { PicaPath, SchemeLink },
   inject: ["cocoda"],
-  props: ["schemes","avram"]
-} 
+  props: {
+    schemes: {
+      type: Array,
+      required: true,
+    },
+    avram: {
+      type: Object,
+      default: null,
+    },
+  },
+}
 </script>

@@ -1,7 +1,7 @@
 import assert from "assert"
 import jskos from "jskos-tools"
 const { ConceptScheme } = jskos
-import { picaSchemes, serializeDiff } from "../src/lib/pica-jskos.js"
+import { picaSchemes, serializeDiff } from "../src/pica-jskos.js"
 import { PicaPath } from "pica-data"
 
 describe("picaSchemes", () => {

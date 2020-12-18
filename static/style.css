@@ -4,6 +4,9 @@ body {
 main {
   margin: 1em;
 }
+h2 {
+  font-size: large;
+}
 .table {
   border-collapse: collapse;
 }

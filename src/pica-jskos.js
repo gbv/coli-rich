@@ -34,8 +34,10 @@ export const indexingFromPica = (record, schemes) => {
   return indexing
 }
 
-// convert indexing set with known pica schemes to PICA record
-export const indexingToPica = (indexing, schemes) => {
+export const indexingToDiff = (indexing, schemes) => indexingToPica(indexing, schemes, true)
+
+// convert indexing set with known pica schemes to PICA diff
+export const indexingToPica = (indexing, schemes, diff=false) => {
   const pica = []
   const occCounter = {}
 
@@ -61,12 +63,17 @@ export const indexingToPica = (indexing, schemes) => {
         occCounter[id] = occ>8 ? (1*occ)+1 : "0"+((1*occ)+1)
       }
 
-      const field = [path.tagString(), occ]
-      field.push(path.subfieldString(), notation)
-      const { SOURCE } = concept
-      if (SOURCE) {
-        SOURCE.forEach(s => field.push("A", s))
+      const field = []
+      if (diff) {
+        field.push(concept.PATCH || "=")
       }
+      field.push(path.tagString(), occ)
+      field.push(path.subfieldString(), notation)
+      field.push("A", "coli-conc")
+
+      ;(concept.mappings||[]).forEach(m => {
+        field.push("A", m.uri)
+      })
 
       pica.push(field)
     })

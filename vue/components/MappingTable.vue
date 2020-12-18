@@ -5,7 +5,9 @@
       :key="m.uri">
       <tr>
         <td>
-          <scheme-link :scheme="m.fromScheme" style="padding-right: 0.5em" />            
+          <scheme-link
+            :scheme="m.fromScheme"
+            style="padding-right: 0.5em" />            
           <concept-link :concept="m.from.memberSet[0]" />
         </td>
         <td>
