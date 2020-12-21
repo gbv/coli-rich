@@ -47,7 +47,7 @@
     "@vue/cli-plugin-eslint": "^4.5.9",
     "@vue/cli-service": "^4.5.9",
     "@vue/compiler-sfc": "^3.0.4",
-    "babel-eslint": "^1.10.0",
+    "babel-eslint": "^10.1.0",
     "concurrently": "^5.3.0",
     "eslint": "^7.15.0",
     "eslint-config-gbv": "^1.0.1",
