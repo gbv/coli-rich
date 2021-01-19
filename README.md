@@ -4,19 +4,54 @@
 
 This repository contains a web application to calculate, analyze and illustrate the enrichment of PICA catalog records with subject indexing data from concordances collected in [project coli-conc](https://coli-conc.gbv.de/). The application consists of a web interface and an API.
 
-## Usage
+## Table of Contents
+
+* [Install](#install)
+
+## Install
 
 coli-rich requires at least Node 14.
 
-Install dependencies, build Vue components and start on port 3077:
+### Clone and Install
 
 ~~~
+git clone https://github.com/gbv/coli-rich.git
+cd jskos-server
 npm install
-npm run build
-npm run start
 ~~~
+
+### Configuration
+
+Default configuration (located in `config/config.default.json`) can be modified by:
+
+* user configuration file `config/config.json`.
+* environment variables `NODE_ENV` (`development` or `production`) and `CONFIG_FILE`.
+
+### Build static files
+
+Unless running in development mode, static files need to be build first:
+
+~~~
+npm run build
+~~~
+
+### Install as service
 
 Recommended installation requires [pm2](https://www.npmjs.com/package/pm2).
+
+## Usage
+
+### Run Server
+
+~~~
+# start in production mode on port 3077 (default)
+npm run start
+
+# start in development mode (hot-reloading)
+run run dev
+~~~
+
+### Update
 
 To update an existing installation:
 

@@ -2,7 +2,7 @@ import { indexingFromPica, indexingToPica, indexingToDiff, serializeDiff } from 
 
 import schemes from "../data/schemes"
 import databases from "../data/databases"
-import config from "./config"
+import config from "../config/index.js"
 
 import { RequestError, NotFoundError } from "./api-errors"
 

@@ -1,7 +1,7 @@
 import express from "express"
 import nunjucks from "nunjucks"
 
-import config from "./src/config"
+import config from "./config"
 import { enrichHandler, indexingHandler } from "./src/enrich"
 import schemes from "./data/schemes"
 import databases from "./data/databases"
@@ -33,6 +33,7 @@ for (let [path, title] of Object.entries(pages)) {
   app.get(`/${path}`, (req, res) => res.render(path || "index", { pages, title, path, config }) )
 }
 
+app.get("/api/config", (req, res) => res.json(config))
 app.get("/api/voc", (req, res) => res.json(schemes))
 app.get("/api/databases", (req, res) => res.json(databases))
 app.get("/api/indexing", indexingHandler)

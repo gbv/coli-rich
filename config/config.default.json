@@ -1,0 +1,18 @@
+{
+  "port": "3077",
+  "unapi": "https://unapi.k10plus.de/",
+  "dbkey": "opac-de-627",
+  "avramApi": "https://format.k10plus.de/avram.pl",
+  "mappingsRegistry": {
+    "provider": "MappingsApi",
+    "api": "https://coli-conc.gbv.de/api/"
+  },
+  "cocoda": "https://coli-conc.gbv.de/cocoda/app/",
+  "examples": [
+    "1673636357",
+    "168675535X",
+    "786733772",
+    "1726524604",
+    "161165839X"
+  ]
+}

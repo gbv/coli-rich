@@ -10,7 +10,6 @@ import jskos from "jskos-tools"
 const { ConceptScheme } = jskos
 import { PicaPath } from "pica-data"
 
-import config from "../src/config.js"
 import cdk from "cocoda-sdk"
 
 // fetch JSON data, return null on error
@@ -19,7 +18,7 @@ const fetchJSON = url => fetch(url).then(res => res.ok ? res.json() : null)
 export default {
   components: { SchemesTable, PicaEditor, IndexingSet },
   provide() {
-    return { jskos, cocoda: config.cocoda }
+    return { jskos, cocoda: undefined }
   },
   data() {
     return {
@@ -31,7 +30,7 @@ export default {
       diff: "",
       dbkey: "opac-de-627",
       ppn: undefined,
-      examples: config.examples,
+      examples: [],
       loadSchemesPromise: null,
     }
   },
@@ -52,7 +51,12 @@ export default {
     },
   },
   created() {
-    this.loadSchemesPromise = this.loadSchemes()
+    fetchJSON("api/config").then(config => {
+      this.config = config
+      this.cocoda = config.cocoda
+      this.examples = config.examples
+      this.loadSchemesPromise = this.loadSchemes()
+    })
   },
   methods: {
     async loadSchemes() {
@@ -70,9 +74,10 @@ export default {
 
       this.profile = "k10plus"
       const indexingFields = ["003@",...Object.values(schemes).map(s => s.PICAPATH)].map(p => new PicaPath(p))
-      const url = config.avramApi + "?profile=" + this.profile + "&field=" + indexingFields.map(s=>s.fieldIdentifier()).join("|")
+      const url = this.config.avramApi + "?profile=" + this.profile + "&field=" + indexingFields.map(s=>s.fieldIdentifier()).join("|")
       this.avram = await fetchJSON(url)
 
+      const config = this.config
       this.enricher = new Enricher({ ...config, schemes })
     },
     updatePPN(ppn) {

@@ -1,2 +1,7 @@
+config*.json
+!config.default.json
+!config.test.json
+!config/config.default.json
+.env
 node_modules/
 dist
