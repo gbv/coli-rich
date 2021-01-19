@@ -4,15 +4,15 @@
 <div id="app">
 
 <p>
-  Sacherschließungsdaten <a href="voc">unterstützer Vokabulare</a> 
-  können aus PICA-Datensätzen extrahieren und mittels <a href="mappings">Normdaten-Mappings</a> angereichert werden. 
+  Sacherschließungsdaten <a href="voc">unterstützer Vokabulare</a>
+  können aus PICA-Datensätzen extrahieren und mittels <a href="mappings">Normdaten-Mappings</a> angereichert werden.
 </p>
 
 <h2>PICA-Datensatz</h2>
 <p>
   Im folgenden Formular lassen sich die Sacherschließungsdaten aus PICA-Datenbanken abrufen
   oder direkt PICA-Daten eingeben:
-</p>  
+</p>
 
 <!-- TODO: allow to select database and avram profile -->
 
@@ -27,9 +27,9 @@
 </p>
 
 <pica-editor ref="recordEditor"
-             :unapi="'api/indexing'" 
+             :unapi="'api/indexing'"
              :avram="avram"
-             :picabase="'http://opac.k10plus.de/'" 
+             :picabase="picabase"
              :dbkey="dbkey"
              @update:record="updateRecord"
              @update:ppn="updatePPN"

@@ -2,9 +2,6 @@ import express from "express"
 import nunjucks from "nunjucks"
 
 import config from "./config"
-import databases from "./data/databases"
-config.databases = databases
-
 import { enrichHandler, indexingHandler } from "./src/enrich"
 import schemes from "./data/schemes"
 

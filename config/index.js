@@ -1,8 +1,11 @@
+/* global process */
 import pkg from "../package"
 import _ from "lodash"
 import { readFileSync } from "fs"
 
-// Prepare environment
+import databases from "../data/databases"
+
+// Prepare environmento
 import dotenv from "dotenv"
 dotenv.config()
 const env = process.env.NODE_ENV || "development"
@@ -31,4 +34,4 @@ if (env === "development") {
 }
 
 // merge and export configuration
-export default _.defaultsDeep({ env, scripts }, configUser, configDefault)
+export default _.defaultsDeep({ env, scripts, databases }, configUser, configDefault)

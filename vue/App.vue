@@ -28,7 +28,9 @@ export default {
       enricher: undefined,
       enrichedIndexing: {},
       diff: "",
+      config: {},
       dbkey: "opac-de-627",
+      picabase: "http://opac.k10plus.de/",
       ppn: undefined,
       examples: [],
       loadSchemesPromise: null,
@@ -44,7 +46,7 @@ export default {
       // Load record when ppn or dbkey has changed
       if (ppn != this.ppn || dbkey != this.dbkey) {
         this.ppn = ppn
-        this.dbkey = dbkey
+        this.setDatabase(dbkey)
         // Wait for schemes to be loaded, then load record
         this.loadSchemesPromise.then(() => this.loadRecord(ppn))
       }
@@ -55,10 +57,18 @@ export default {
       this.config = config
       this.cocoda = config.cocoda
       this.examples = config.examples
+      this.setDatabase(config.dbkey)
       this.loadSchemesPromise = this.loadSchemes()
     })
   },
   methods: {
+    setDatabase(dbkey) {
+      const db = this.config.databases.find(db => db.dbkey === dbkey)
+      if (db) {
+        this.dbkey = dbkey
+        this.picabase = db.picabase
+      }
+    },
     async loadSchemes() {
       // TODO: use cocoda-sdk instead
       const schemes =(await fetchJSON("api/voc")).map(s => new ConceptScheme(s))
