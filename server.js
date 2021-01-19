@@ -23,7 +23,7 @@ app.set("view engine", "html")
 nunjucks.configure("views", { express: app, autoescape: true })
 
 const pages = {
-  "": "coli-rich",
+  "": config.title,
   voc: "Vokabulare",
   indexing: "Sacherschließung",
   mappings: "Mappings",

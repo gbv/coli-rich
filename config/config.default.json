@@ -1,5 +1,6 @@
 {
   "port": "3077",
+  "title": "coli-rich",
   "unapi": "https://unapi.k10plus.de/",
   "dbkey": "opac-de-627",
   "avramApi": "https://format.k10plus.de/avram.pl",
