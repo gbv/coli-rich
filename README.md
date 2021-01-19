@@ -6,11 +6,16 @@ This repository contains a web application to calculate, analyze and illustrate 
 
 ## Table of Contents
 
-* [Install](#install)
+- [Install](#install)
+  - [Clone and Install](#clone-and-install)
+  - [Configuration](#configuration)
+  - [Run Server](#run-server)
+- [Contribute](#contribute)
+- [License](#license)
 
 ## Install
 
-coli-rich requires at least Node 14.
+coli-rich is written in ECMAScript 2015 (ES6) with [Vue3](https://v3.vuejs.org/). The application requires at least Node 14.
 
 ### Clone and Install
 
@@ -27,42 +32,28 @@ Default configuration (located in `config/config.default.json`) can be modified 
 * user configuration file `config/config.json`.
 * environment variables `NODE_ENV` (`development` or `production`) and `CONFIG_FILE`.
 
-### Build static files
+### Run Server
 
-Unless running in development mode, static files need to be build first:
+Recommended installation requires [pm2](https://www.npmjs.com/package/pm2):
+
+~~~
+pm2 start ecosystem.config.json
+~~~
+
+Alternatively build static files and run (by default on port 3077):
 
 ~~~
 npm run build
-~~~
-
-### Install as service
-
-Recommended installation requires [pm2](https://www.npmjs.com/package/pm2).
-
-## Usage
-
-### Run Server
-
-~~~
-# start in production mode on port 3077 (default)
 npm run start
+~~~
 
-# start in development mode (hot-reloading)
+Or start in in development mode (hot-reloading)
+
+~~~
 run run dev
 ~~~
 
-### Update
-
-To update an existing installation:
-
-~~~
-git pull
-npm install
-npm run build
-pm2 restart coli-conc
-~~~
-
-## Technical Background
+## Contribute
 
 coli-rich extends [JSKOS](https://gbv.github.io/jskos/) format by Indexing Sets.
 
@@ -91,25 +82,6 @@ The concepts in an Indexing Set can further have fields:
 
 Given the Concept Scheme field `PICAPATH`, an Indexing Set can be converted from and to PICA format or PICA Patch format.
 
-## Development
+## License
 
-The application is written in ECMAScript 2015 (ES6) with [Vue3](https://v3.vuejs.org/).
-
-Install dependencies and start developer instance:
-
-~~~sh
-npm i
-npm run dev
-~~~
-
-Run some tests:
-
-~~~sh
-npm test
-~~~
-
-Build static web interface files for deployment in subfolder `/dist/`:
-
-~~~sh
-npm run build
-~~~
+MIT ©2020 Verbundzentrale des GBV (VZG)
