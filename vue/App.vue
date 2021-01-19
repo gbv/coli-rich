@@ -72,9 +72,9 @@ export default {
 
       this.schemes = schemes
 
-      this.profile = "k10plus"
+      const { avramApi, avramProfile } = this.config
       const indexingFields = ["003@",...Object.values(schemes).map(s => s.PICAPATH)].map(p => new PicaPath(p))
-      const url = this.config.avramApi + "?profile=" + this.profile + "&field=" + indexingFields.map(s=>s.fieldIdentifier()).join("|")
+      const url = `${avramApi}?profile=${avramProfile}&field=${indexingFields.map(s=>s.fieldIdentifier()).join("|")}`
       this.avram = await fetchJSON(url)
 
       const config = this.config

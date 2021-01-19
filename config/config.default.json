@@ -4,6 +4,7 @@
   "unapi": "https://unapi.k10plus.de/",
   "dbkey": "opac-de-627",
   "avramApi": "https://format.k10plus.de/avram.pl",
+  "avramProfile": "k10plus",
   "mappingsRegistry": {
     "provider": "MappingsApi",
     "api": "https://coli-conc.gbv.de/api/"
