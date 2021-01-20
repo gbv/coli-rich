@@ -7,7 +7,7 @@
         <th />
         <th>Name</th>
         <th colspan="2">
-          Cocoda
+          Mappings
         </th>
         <th>Felder</th>
         <th>Valide Notationen</th>
@@ -21,8 +21,15 @@
           <scheme-link :scheme="scheme" />
         </td>
         <td>{{ scheme.prefLabel.de }}</td>
-        <td><a :href="`${cocoda}?fromScheme=${scheme.uri}`">↦ </a></td>
-        <td><a :href="`${cocoda}?toScheme=${scheme.uri}`">⇥</a></td>
+        <td v-if="cocoda.value">
+          <a :href="`${cocoda.value}?fromScheme=${scheme.uri}`">↦ </a>
+        </td>
+        <td v-if="cocoda.value">
+          <a :href="`${cocoda.value}?toScheme=${scheme.uri}`">⇥</a>
+        </td>
+        <td
+          v-else
+          colspan="2" />
         <td>
           <PicaPath
             :path="scheme.PICAPATH"

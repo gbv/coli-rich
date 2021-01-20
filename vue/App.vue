@@ -10,6 +10,8 @@ import jskos from "jskos-tools"
 const { ConceptScheme } = jskos
 import { PicaPath } from "pica-data"
 
+import { computed } from "vue"
+
 import cdk from "cocoda-sdk"
 
 // fetch JSON data, return null on error
@@ -18,7 +20,10 @@ const fetchJSON = url => fetch(url).then(res => res.ok ? res.json() : null)
 export default {
   components: { SchemesTable, PicaEditor, IndexingSet },
   provide() {
-    return { jskos, cocoda: undefined }
+    return {
+      jskos,
+      cocoda: computed(() => this.config.cocoda),
+    }
   },
   data() {
     return {
@@ -55,7 +60,6 @@ export default {
   created() {
     fetchJSON("api/config").then(config => {
       this.config = config
-      this.cocoda = config.cocoda
       this.examples = config.examples
       this.setDatabase(config.dbkey)
       this.loadSchemesPromise = this.loadSchemes()

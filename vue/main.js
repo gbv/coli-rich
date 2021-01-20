@@ -8,7 +8,7 @@ import { createRouter, createWebHistory } from "vue-router"
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", component: App },
+    { path: "/:catchAll(.*)", component: App },
   ],
 })
 app.use(router)

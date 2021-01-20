@@ -23,15 +23,8 @@ try {
 }
 
 // set script pathes depending on environment
-let scripts = ["dist/js/chunk-vendors.js", "dist/js/app.js"]
-if (env === "development") {
-  const { publicPath } = pkg.vue
-  scripts = [
-    `${publicPath}js/chunk-vendors.js`,
-    `${publicPath}js/chunk-common.js`,
-    `${publicPath}js/app.js`,
-  ]
-}
+const jsPath = env === "development" ? pkg.vue.publicPath : "dist/"
+const scripts = [ `${jsPath}js/chunk-vendors.js`, `${jsPath}js/app.js` ]
 
 // merge and export configuration
 export default _.defaultsDeep({ env, scripts, databases }, configUser, configDefault)

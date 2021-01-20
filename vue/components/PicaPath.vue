@@ -14,6 +14,9 @@
 <script>
 import { PicaPath, picaFieldSchedule } from "pica-data"
 
+/**
+ * PICA Path expression and corresponding Pica3 tags, linked to schedule.
+ */
 export default {
   props: {
     path: {

@@ -7,11 +7,11 @@
         <td>
           <scheme-link
             :scheme="m.fromScheme"
-            style="padding-right: 0.5em" />            
+            style="padding-right: 0.5em" />
           <concept-link :concept="m.from.memberSet[0]" />
         </td>
         <td>
-          <a :href="cocoda ? cocoda + '?mappingUri=' + m.uri : m.uri">{{ mappingTypeSymbol(m) }}</a>
+          <a :href="cocoda.value ? cocoda.value + '?mappingUri=' + m.uri : m.uri">{{ mappingTypeSymbol(m) }}</a>
         </td>
         <td>
           <span v-if="(m.creator||[]).length">

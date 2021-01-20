@@ -3,11 +3,13 @@
 </template>
 
 <script>
-// Shows notation of a scheme, linked to BARTOC
+/**
+ * Notation of a scheme, linked to BARTOC.
+ */
 export default {
   props: {
     scheme: {
-      type: Array,
+      type: Object,
       required: true,
     },
   },
