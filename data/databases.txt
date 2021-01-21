@@ -1,3 +1,4 @@
 opac-de-627
+test-k10plus
 test-k10plus-kxpt
 k10plus

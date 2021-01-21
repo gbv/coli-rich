@@ -11,6 +11,17 @@
     "url": "https://kxp.k10plus.de/DB=2.0/"
   },
   {
+    "dbkey": "test-k10plus",
+    "picabase": "http://cbst7.gbv.de:1780/DB=1.1/",
+    "srubase": "http://sru.gbv.de/test-k10plus",
+    "title": {
+      "de": "K10plus-Katalogisierungsdatenbank (cbst7)",
+      "en": "K10plus-Katalogisierungsdatenbank (cbst7)"
+    },
+    "uri": "http://uri.gbv.de/database/test-k10plus",
+    "url": "http://cbst7.gbv.de:1780/DB=1.1/"
+  },
+  {
     "dbkey": "test-k10plus-kxpt",
     "picabase": "http://gsot.gbv.de:9000/DB=1.1/",
     "srubase": "http://sru.gbv.de/test-k10plus-kxpt",
