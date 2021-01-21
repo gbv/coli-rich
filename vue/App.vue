@@ -26,6 +26,7 @@ export default {
     }
   },
   data() {
+    const configPromise = fetchJSON("api/config")
     return {
       indexing: {},
       schemes: [],
@@ -38,6 +39,7 @@ export default {
       picabase: "http://opac.k10plus.de/",
       ppn: undefined,
       examples: [],
+      configPromise,
       loadSchemesPromise: null,
     }
   },
@@ -51,14 +53,13 @@ export default {
       // Load record when ppn or dbkey has changed
       if (ppn != this.ppn || dbkey != this.dbkey) {
         this.ppn = ppn
-        this.setDatabase(dbkey)
-        // Wait for schemes to be loaded, then load record
+        this.configPromise.then(() => this.setDatabase(dbkey))
         this.loadSchemesPromise.then(() => this.loadRecord(ppn))
       }
     },
   },
   created() {
-    fetchJSON("api/config").then(config => {
+    this.configPromise.then(config => {
       this.config = config
       this.examples = config.examples
       this.setDatabase(config.dbkey)
@@ -71,6 +72,7 @@ export default {
       if (db) {
         this.dbkey = dbkey
         this.picabase = db.picabase
+        // TODO: reload record
       }
     },
     async loadSchemes() {

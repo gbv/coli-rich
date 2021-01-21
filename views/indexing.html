@@ -14,16 +14,14 @@
   oder direkt PICA-Daten eingeben:
 </p>
 
-<!-- TODO: allow to select database and avram profile -->
-
-<p>
-  <small>
-    <ul class="inline">
-      <li v-for="ppn in examples" :key="ppn">
-        <router-link :to="`?id=${dbkey}:ppn:${ppn}`">{{ppn}}</router-link>
-      </li>
-    </ul>
-  </small>
+<p v-if="config.databases">
+  <form>
+    <select @change="setDatabase($event.target.value)">
+      <option v-for="db in config.databases" :key="db.dbkey" :value="db.dbkey" :selected="dbkey == db.dbkey">
+      {{ db.title.de }}
+      </option>
+    </select>
+  </form>
 </p>
 
 <pica-editor ref="recordEditor"
@@ -34,6 +32,18 @@
              @update:record="updateRecord"
              @update:ppn="updatePPN"
 ></pica-editor>
+
+<p>
+  <small>
+    Examples:
+    <ul class="inline">
+      <li v-for="ppn in examples" :key="ppn">
+        <router-link :to="`?id=${dbkey}:ppn:${ppn}`">{{ppn}}</router-link>
+      </li>
+    </ul>
+  </small>
+</p>
+
 
 <div v-if="Object.keys(indexing).length">
 

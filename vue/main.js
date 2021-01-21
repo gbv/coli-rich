@@ -5,12 +5,9 @@ const app = createApp(App)
 
 // Load and configure vue-router
 import { createRouter, createWebHistory } from "vue-router"
-const router = createRouter({
+app.use(createRouter({
   history: createWebHistory(),
-  routes: [
-    { path: "/:catchAll(.*)", component: App },
-  ],
-})
-app.use(router)
+  routes: [ { path: "/:catchAll(.*)", component: App } ],
+}))
 
 app.mount("#app")
