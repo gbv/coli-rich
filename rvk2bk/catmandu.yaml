@@ -10,6 +10,13 @@ importer:
       recordSchema: picaxml
       parser: picaxml
       limit: 1000
+  kxpnorm:
+    package: SRU
+    options:
+      base: http://sru.k10plus.de/opac-de-627!rec=2
+      recordSchema: picaxml
+      parser: picaxml
+      limit: 2
 exporter:
   pp:
     package: PICA

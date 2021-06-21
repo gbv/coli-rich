@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use v5.14;
 use PICA::Data qw(1.18 :all);
+use Catmandu qw(importer);
 use JSON::API;
 
 # Ausgehend von einer RVK-Notation
@@ -44,6 +45,14 @@ my $bkConcepts = JSON::API->new('http://api.dante.gbv.de/')->get(
 );
 die "BK $bkNotation nicht gefunden" unless @$bkConcepts == 1;
 
+# get PPN of BK record
+my $importer = importer( 'kxpnorm', query => "pica.bkl=$bkNotation" );
+my $bkRecord = $importer->next;
+die "Failed to get unique PPN for BK record $bkNotation\n"
+  if !$bkRecord || $importer->next;
+my $bkPPN = $bkRecord->{_id};
+say "$bkNotation = $bkPPN";
+
 my $rvkCheck;
 if ( length $rvkNotation == 2 ) {
     say "RVK $rvkNotation (und Unterklassen) => BK $bkNotation ($mappingUri)";
@@ -58,8 +67,9 @@ else {
 }
 
 # TODO: escape name?
-my $writer =
-  pica_writer( 'plain', annotated => 1, fh => "$rvkNotation.rvk2bk.pica" );
+my $outFile = "$rvkNotation.rvk2bk.pica";
+my $writer = pica_writer( 'plain', annotated => 1, fh => $outFile );
+my $count;
 
 while ( my $record = $parser->next ) {
     my $ppn = $record->fields('003@');
@@ -70,13 +80,12 @@ while ( my $record = $parser->next ) {
 
     next unless grep { $rvkCheck->($_) } $record->values('045R$a');
 
-    my $bkocc = nextBkOcc(@$bk) or next;
-
     $writer->write(
         [
             @$ppn,
             [
-                '045Q', $bkocc,
+                '045Q', '01',
+                9 => $bkPPN,
                 a => $bkNotation,
                 A => 'coli-conc RVK->BK',
                 A => $mappingUri,
@@ -84,17 +93,7 @@ while ( my $record = $parser->next ) {
             ]
         ]
     );
+    $count++;
 }
 
-sub nextBkOcc {
-    my @used = sort map { $_->[1] } @_;
-
-    for my $occ ( 1 .. 9 ) {
-        if ( @used && $used[0] == $occ ) {
-            shift @used;
-        }
-        else {
-            return "0$occ";
-        }
-    }
-}
+say "Written $count changes to $outFile";
