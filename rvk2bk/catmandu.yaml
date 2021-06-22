@@ -17,6 +17,18 @@ importer:
       recordSchema: picaxml
       parser: picaxml
       limit: 2
+  cbst7:
+    package: SRU
+    options:
+      base: http://sru.k10plus.de/test-k10plus
+      recordSchema: picaxml
+      parser: picaxml
+  kxpt:
+    package: SRU
+    options:
+      base: http://sru.k10plus.de/test-k10plus-kxpt
+      recordSchema: picaxml
+      parser: picaxml
 exporter:
   pp:
     package: PICA
