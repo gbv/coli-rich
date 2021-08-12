@@ -11,6 +11,8 @@ Die Skripte in diesem Verzeichnis ermitteln Kataloganreicherung für den K10plus
    werden nur Notationen aus zwei Buchstaben unterstützt, es werden jedoch alle
    mit diesen Buchstaben beginnenden Notationen gefunden.
 
+* `/count.sh` zählt per SRU Anzahl der Titeldatensätze die eine gegebene Anfrage erfüllen
+
 Das vollständige Herunterladen aller Datensätze mit RVK ist theoretisch so möglich (dauert fast einen
 Tag), es gibt aber einige Klassen deren Ergebnismengen zu groß sind:
 

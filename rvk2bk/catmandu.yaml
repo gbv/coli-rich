@@ -10,6 +10,25 @@ importer:
       recordSchema: picaxml
       parser: picaxml
       limit: 1000
+  kxpmeta:
+    package: SRU
+    options:
+      base: http://sru.k10plus.de/opac-de-627
+      recordSchema: picaxml
+      parser: meta
+      limit: 0
+  kxponline:
+    package: SRU
+    options:
+      base: http://sru.bsz-bw.de/swb-299!xpn=online
+      recordSchema: picaxml
+      parser: picaxml
+  kxpoffline:
+    package: SRU
+    options:
+      base: http://sru.bsz-bw.de/swb-299!xpn=online
+      recordSchema: picaxml
+      parser: picaxml
   kxpnorm:
     package: SRU
     options:
