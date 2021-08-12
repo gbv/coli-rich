@@ -34,6 +34,7 @@ Hauptklassen der RVK, die per exactMatch auf eine BK-Unterklasse der untersten E
 * `YG` Neurologie
 * `YP` Zahnmedizin
 * `YQ` Kinderheilkunde
+* `WT` Verhaltensforschung und Tierpsychologie
 
 Klassen der RVK, die per exactMatch auf eine beliebige BK-Klasse gemappt sind:
 
