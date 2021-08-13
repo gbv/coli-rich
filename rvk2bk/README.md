@@ -43,3 +43,25 @@ Klassen der RVK, die per exactMatch auf eine beliebige BK-Klasse gemappt sind:
 * `ET 500` Lexikologie
 * `ST 240 - ST 250` Programmiersprachen (derzeit nicht unterstützt, da Unterklassen relevant)
 
+## Statistik
+
+Mit dem Skript `count.sh` kann eine Anzahl von Datensätzen per SRU gezählt werden:
+
+Anzahl von Datensätzen, deren Sacherschließung mit Mappings angereichert wurde:
+
+    ./count.sh 'pica.seq=coli-conc.*'
+
+Anzahl von Datensätzen, deren Sacherschließung mit RVK-Mappings angereichert wurde:
+
+    ./count.sh 'pica.seq="coli-conc rvk.*"'
+
+Anzahl von Datensätzen, deren Sacherschließung mit RVK-BK-Mappings angereichert wurde:
+
+    ./count.sh 'pica.seq="coli-conc rvk bk"'
+
+Anzahl von Datensätzen, deren Sacherschließung mit einem bestimmten Mapping angreichert wurde
+(Achtung: Sonderzeichen durch Leerzeichen ersetzen!)
+Beispiel: Mapping <https://coli-conc.gbv.de/api/mappings/5812d5a4-4301-4677-9236-e6e3b8d68f24>:
+
+    ./count.sh 'pica.seq="https coli conc gbv de api mappings d415aba4-14c2-4a9c-822a-1a589787545d"'
+
