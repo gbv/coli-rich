@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 
 # enable cronjob with this script piped to stats.ndjson
 
