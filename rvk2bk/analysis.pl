@@ -70,7 +70,9 @@ sub getRVKClass {
 
 sub getRVKBKMappings {
     my $rvkNotation = shift;
-    my $api         = JSON::API->new('http://coli-conc.gbv.de/api/mappings');
+
+    # TODO: get trusted mappings only
+    my $api = JSON::API->new('http://coli-conc.gbv.de/api/mappings');
     return @{
         $api->get(
             '',

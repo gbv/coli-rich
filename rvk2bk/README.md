@@ -6,27 +6,33 @@ Die Skripte in diesem Verzeichnis ermitteln Kataloganreicherung für den K10plus
 
 * `catmandu.yaml` Konfigurationsdatei
 
-*  `./download-by-rvk.sh` läd Titeldatensätze beschränkt auf Normdatenfelder
-   (BK und RVK) aus dem K10plus. Zur Vereinfachung der Suche nach RVK-Notationen
-   werden nur Notationen aus zwei Buchstaben unterstützt, es werden jedoch alle
-   mit diesen Buchstaben beginnenden Notationen gefunden.
+* `./download-by-rvk.sh` läd Titeldatensätze beschränkt auf Normdatenfelder
+  (BK und RVK) aus dem K10plus. Zur Vereinfachung der Suche nach RVK-Notationen
+  werden nur Notationen aus zwei Buchstaben unterstützt, es werden jedoch alle
+  mit diesen Buchstaben beginnenden Notationen gefunden.
 
-* `/count.sh` zählt per SRU Anzahl der Titeldatensätze die eine gegebene Anfrage erfüllen
+  Das vollständige Herunterladen aller Datensätze mit RVK ist theoretisch so möglich (dauert fast einen
+  Tag), es gibt aber einige Klassen deren Ergebnismengen zu groß sind:
 
-Das vollständige Herunterladen aller Datensätze mit RVK ist theoretisch so möglich (dauert fast einen
-Tag), es gibt aber einige Klassen deren Ergebnismengen zu groß sind:
+  ~~~bash
+  for X in {A..Z}; do for Y in {A..Z}; do ./download-by-rvk.sh $X$Y; done; done
+  ~~~
 
-~~~bash
-for X in {A..Z}; do for Y in {A..Z}; do ./download-by-rvk.sh $X$Y; done; done
-~~~
+* `/count.sh` zählt per SRU Anzahl der Titeldatensätze die eine gegebene Anfrage erfüllen.
 
-* `rvk2bk.pl` sucht ausgehend von einer RVK-Notation nach einem passenden 1-zu-1 exactMatch-Mapping
+* `rvkbk-mappings.sh` läd RVK-BK-Mappings vom Typ < oder = für eine gegebene RVK-Notation, mit Annotationen
+
+* `trusted-mappings.jq`: filtern Mappings denen für die Anreicherung vertraut werden kann
+
+* `rvk2bk.pl` sucht ausgehend von einer RVK-Notation nach passenden Mappings
   und geht die betreffende Download-Datei durch um BK-Anreicherung zu erzeugen. Beispiel:
 
-~~~bash
-./rvk2bk.pl "ET 500"  # TODO: Unterklassen einbeziehen
-./rvk2bk.pl "XL"      # Ganze Oberklasse (weil auf BK-Blattknoten gemappt)
-~~~
+  ~~~bash
+  ./rvk2bk.pl "ET 500"  # TODO: Unterklassen einbeziehen
+  ./rvk2bk.pl "XL"      # Ganze Oberklasse (weil auf BK-Blattknoten gemappt)
+  ~~~
+
+* `analysis.pl` durchläuft einen Teilbaum der RVK und ermittelt welcher Bereich durch Mappings abgedeckt ist.
 
 ## Beispiele
 
