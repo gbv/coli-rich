@@ -1,10 +1,81 @@
 # Anreicherung des K10plus mit BK-Notationen auf Grundlage von RVK-Notationen
 
-Die Skripte in diesem Verzeichnis ermitteln Kataloganreicherung für den K10plus um fehlende BK-Notationen auf Grundlage vorhandener RVK-Notationen.
+Im Rahmen des Projekt [coli-conc](https://coli-conc.gbv.de/) werden Mappings zwischen Klassen der Regensburger Verbundklassifikation (RVK) und Klassen der Basisklassifikation (BK) gesammelt, erstellt und kontrolliert (siehe [RVK-BK-Mappings in der Konkordanzdatenbank](https://coli-conc.gbv.de/cocoda/app/?toScheme=http%3A%2F%2Furi.gbv.de%2Fterminology%2Fbk%2F&fromScheme=http%3A%2F%2Furi.gbv.de%2Fterminology%2Frvk%2F&search=%7B%22fromScheme%22%3A%22RVK%22%2C%22toScheme%22%3A%22BK%22%7D)). Auf Grundlage dieser Mappings können Titeldatensätze im K10plus-Katalog um fehlende BK-Notationen ergänzt werden. Diese Anreicherung läuft unter dem Projektnamen **coli-rich**.
+
+## Übersicht
+
+Zur Anreicherung erfolgt in fünf Schritten:
+
+1. [Erstellung von Mappings](#1-erstellung-von-mappings)
+2. [Auswahl der für die Anreicherung in Frage kommenden Mappings](#2-auswahl-von-mappings)
+3. [Auswahl der anzureichernden Titeldatensätze](#3-auswahl-von-titeldatensätzen)
+4. Ermittlung der Anreicherung
+5. Eintragung der Anreicherung im K10plus
+
+Für den Produktivbetrieb werden Schritt 3 bis 5 dauerhaft und automatisch ablaufen.
+
+### 1. Erstellung von Mappings
+
+Zur Erstellung von Mappings dient die [Webanwendung Cocoda](https://coli-conc.gbv.de/cocoda/app/). Mappings können von allen Interessierten erstellt und per Benutzerinterface und APIs abgefragt werden. Jedes Mapping ist einem Benutzeraccount zugeordnet.
+
+### 2. Auswahl von Mappings
+
+Die Auswahl der für das Mapping in Frage kommenden Mappings basiert auf zwei Kritierien:
+
+* Formal: Nur Mappings vom Mappingtype exactMatch (=) und narrowMatch (<) können für die automatische Anreicherung berücksichtigt werden, weil nur in diesen Fällen sicher ist dass alle mit einer RVK-Klassen (oder ihren Unterklassen) erschlossenen Titel auch in die gemappte BK-Klasse passen.
+
+* Inhaltlich: Die ausgewählten Mappings müssen vertrauenswürdig sein. Die Auswahl kann auf Grundlage folgender Informationen erfolgen:
+
+  * der Benutzeraccount unter dem ein Mapping erstellt wurde
+  * ob das Mapping bestätigt wurde (die Bestätigung von Mappings ist nur ausgewählten Benutzeraccounts möglich)
+  * ob und wie das Mapping bewertet wurde (alle Benutzeraccounts können Mappings mit +1 oder -1 bewerten)
+  * ob und zu welcher Konkordanz das Mapping gehört (noch nicht umgesetzt)
+
+  Momentan werden Mappings ausgewählt die *entweder* bestätigt wurden *oder* von einem ausgewählten Benutzeraccount stammen und nicht negativ bewertet wurden. Die Liste der ausgewählten Benutzeraccounts lässt sich konfigurieren.
+
+Geplant is noch eine zusätzliche Konsistenzprüfung, nach der die ausgewählten Mappings in sich widerspruchsfrei sein müssen. So sollte beispielsweise eine RVK-Unterklasse nicht auf eine umfassendere BK-Klasse gemappt sein als ihre Oberklasse.
+
+### 3. Auswahl von Titeldatensätzen
+
+In der Pilotphase werden alle Titeldatensätze im K10plus ausgewählt, die mit RVK aber nicht mit BK erschlossen sind. Dabei gibt es zwei Möglichkeiten:
+
+* Auswahl aller Titeldatensätze die mit einer RVK-Klasse oder mit in der Hierarchie darunter liegenden Klassen erschlossen sind (per SRU-Suchanfrage). Dies hat den Vorteil dass ausgehend von einem Mapping alle anzureichernden Titel ausgewählt werden können.
+
+* Auswahl konkreter Titeldatensätze (per PPN oder PPN-Liste). Hierbei muss für jeden Titel einzeln geprüft werden ob und welche passenden Mappings zur Anreicherung vorhanden sind, was insgesamt langsamer ist.
+
+Im Produktivbetrieb soll das Verfahren erweitert werden um vorhandene BK-Notationen zu überprüfen und um angereicherte BK-Notationen anzupassen wenn die ausgewählten Mappings geändert haben.
+
+### 4. Ermittlung der Anreicherung
+
+Nach Auswahl von Mappings und Titeldatensätzen können Datensätze mit einer RVK-Klasse α folgendermaßen um BK-Klassen angereichert werden:
+
+* Gibt es ein Mapping α = β oder α < β passt die BK-Klasse β
+
+* Gibt es stattdessen eine (ggf. transitive) Oberklasse γ von α mit einem Mapping γ = β oder γ < β dann passt ebenfalls die BK-Klasse β.
+  Allerdings kann es sein, dass eine Unterklassen von β noch besser passen würde.
+
+Die ermittelten Anreicherungen werden im [PICA Änderungsformat](https://pro4bib.github.io/pica/#/formate?id=%c3%84nderungsformat) zur Eintragung in den K10plus weitergegeben. Jede Anreicherung ist ein PICA-Feld `045Q/01` mit vier Unterfeldern:
+
+* `$9` PPN des BK-Normdatensatzes
+* `$a` BK-Notation
+* `$A` Die Zeichenkette "`coli-conc RVK->BK`"
+* `$A` Die URI des Mappings auf dessen Grundlage die Anreicherung ermittelt wurde
+
+### 5. Eintragung der Anreicherung im K10plus
+
+Die durch Anreicherung ermittelten Änderungen werden gesammelt und in Batches von einigen Tausend Änderungen in den K10plus eingetragen. Im Produktivbetrieb soll die Eintragung täglich oder mindestens wöchentlich erfolgen, so dass neu erstellte Mappings zeitnah zu Anreicherungen im K10plus führen. Je nach Anzahl der Datensätze ist auch eine Eintragung innerhalb von Minuten denkbar.
+
+## Technische Umsetzung
+
+Die Skripte in diesem Verzeichnis ermitteln Kataloganreicherung für den K10plus um fehlende BK-Notationen auf Grundlage vorhandener RVK-Notationen. Es handelt sich um eine erste Version in Perl, die später durch eine Neuimplementierung in JavaScript abgelöst werden soll.
+
+### Installation und Konfiguration
 
 * `cpanfile` Perl-Dependencies (`cpanm --installdeps .`)
 
 * `catmandu.yaml` Konfigurationsdatei
+
+## Skripte
 
 * `./download-by-rvk.sh` läd Titeldatensätze beschränkt auf Normdatenfelder
   (BK und RVK) aus dem K10plus. Zur Vereinfachung der Suche nach RVK-Notationen
