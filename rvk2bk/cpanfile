@@ -1,4 +1,0 @@
-requires 'PICA::Data', '>=1.18';
-requires 'JSON::API';
-requires 'Catmandu::PICA';
-requires 'Catmandu::SRU', '>=0.430';
