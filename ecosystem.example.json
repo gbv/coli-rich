@@ -1,0 +1,7 @@
+{
+  "name": "coli-rich",
+  "script": "./index.js",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
