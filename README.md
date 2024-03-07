@@ -15,7 +15,7 @@ This repository contains a web application to calculate, analyze and illustrate 
 
 ## Install
 
-coli-rich is written in ECMAScript 2015 (ES6) with [Vue3](https://v3.vuejs.org/). The application requires at least Node 14.
+coli-rich is written in ECMAScript 2015 (ES6) with [Vue3](https://v3.vuejs.org/). The application currently requires Node.js 14.
 
 ### Clone and Install
 

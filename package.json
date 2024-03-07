@@ -29,7 +29,7 @@
     "url": "git+https://github.com/gbv/coli-rich.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": "14"
   },
   "dependencies": {
     "axios": "^0.20.0",
