@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  coli-rich:
+    build:
+      context: ..
+      dockerfile: .docker/Dockerfile
+    volumes:
+      - ../config/config.json:/config/config.json
+    ports:
+      - 3077:3077
+    restart: unless-stopped
