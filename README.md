@@ -21,7 +21,7 @@ coli-rich is written in ECMAScript 2015 (ES6) with [Vue3](https://v3.vuejs.org/)
 
 ~~~
 git clone https://github.com/gbv/coli-rich.git
-cd jskos-server
+cd coli-rich
 npm install
 ~~~
 
@@ -84,4 +84,4 @@ Given the Concept Scheme field `PICAPATH`, an Indexing Set can be converted from
 
 ## License
 
-MIT ©2020 Verbundzentrale des GBV (VZG)
+MIT ©2024 Verbundzentrale des GBV (VZG)
