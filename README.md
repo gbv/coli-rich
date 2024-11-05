@@ -1,4 +1,6 @@
-# coli-rich
+# coli-rich (deprecated)
+
+**replaced by <https://github.com/gbv/coli-rich-web>**
 
 [![Build Status](https://travis-ci.org/gbv/coli-rich.svg?branch=master)](https://travis-ci.org/gbv/coli-rich)
 
